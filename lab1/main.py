@@ -15,7 +15,18 @@ class Scanner(Lexer):
               INT, FLOAT, STR
               }
 
-    pass
+    ignore = ' \t'
+
+    ID = r'[a-zA-Z_][a-zA-Z0-9_]*'
+    PLUS = r'\+'
+    MINUS = r'\-'
+    MUL = r'\*'
+    DIV = r'\/'
+
+    ID['\.+'] = MAT_PLUS
+    ID['\.-'] = MAT_MINUS
+    ID['\.*'] = MAT_MUL
+    ID['\./'] = MAT_DIV
 
 
 if __name__ == '__main__':
