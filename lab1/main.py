@@ -4,6 +4,17 @@ from sly import Lexer
 
 class Scanner(Lexer):
 
+    tokens = {ID, PLUS, MINUS, MUL, DIV, MAT_PLUS,
+              MAT_MINUS, MAT_MUL, MAT_DIV, ASSIGN,
+              ADD_ASSIGN, SUB_ASSIGN, MUL_ASSIGN,
+              DIV_ASSIGN, LESS, GREATER, LEQ, GEQ,
+              NEQ, EQ, OP_BRAC, CL_BRAC, OP_SQ_BRAC,
+              CL_SQ_BRAC, OP_CRL_BRAC, CL_CRL_BRAC,
+              RANGE, TRANSPOSE, COMMA, SEMICOLON, BREAK,
+              CONTINUE, RETURN, EYE, ZEROS, ONES, PRINT,
+              INT, FLOAT, STR
+              }
+
     pass
 
 
