@@ -3,59 +3,95 @@ from sly import Lexer
 
 
 class Scanner(Lexer):
-    tokens = {ID, PLUS, MINUS, MUL, DIV, MAT_PLUS,
-              MAT_MINUS, MAT_MUL, MAT_DIV, ASSIGN,
-              ADD_ASSIGN, SUB_ASSIGN, MUL_ASSIGN,
-              DIV_ASSIGN, LESS, GREATER, LEQ, GEQ,
-              NEQ, EQ, OP_BRAC, CL_BRAC, OP_SQ_BRAC,
-              CL_SQ_BRAC, OP_CRL_BRAC, CL_CRL_BRAC,
-              RANGE, TRANSPOSE, COMMA, SEMICOLON, BREAK,
-              CONTINUE, RETURN, EYE, ZEROS, ONES, PRINT,
-              FLOAT, INT, STR
-              }
 
+    # Reserved keywords
+    reserved = {
+        'if': 'IF',
+        'else': 'ELSE',
+        'for': 'FOR',
+        'while': 'WHILE',
+        'break': 'BREAK',
+        'continue': 'CONTINUE',
+        'return': 'RETURN',
+        'eye': 'EYE',
+        'zeros': 'ZEROS',
+        'ones': 'ONES',
+        'print': 'PRINT'
+    }
+
+    tokens = {
+        ID, MAT_PLUS, MAT_MINUS, MAT_MUL, MAT_DIV,
+        ADD_ASSIGN, SUB_ASSIGN, MUL_ASSIGN,
+        DIV_ASSIGN, LEQ, GEQ, EQ, NEQ, FLOAT, INT, STR
+    } | set(reserved.values())
+
+    # Literals
+    literals = {
+        '+', '-', '*', '/',
+        '=', '>', '<', '(',
+        ')', '[', ']', '{',
+        '}', ',', ':', ';',
+        '\''
+    }
+
+    # String containing ignored characters (between tokens)
     ignore = ' \t'
+
+    # Ignore comments
     ignore_comment = r'\#.*'
-    ignore_newline = r'\n+'
 
+    # Define a rule so we can track line numbers
+    @_(r'\n+')
+    def ignore_newline(self, t):
+        self.lineno += len(t.value)
+
+    # Base ID rule
     ID = r'[a-zA-Z_][a-zA-Z0-9_]*'
-    PLUS = r'\+'
-    MINUS = r'-'
-    MUL = r'\*'
-    DIV = r'/'
 
+    # Special cases
+    ID['if'] = IF
+    ID['else'] = ELSE
+    ID['for'] = FOR
+    ID['while'] = WHILE
+    ID['break'] = BREAK
+    ID['continue'] = CONTINUE
+    ID['return'] = RETURN
+    ID['eye'] = EYE
+    ID['zeros'] = ZEROS
+    ID['ones'] = ONES
+    ID['print'] = PRINT
+
+    # Matrix operators
     MAT_PLUS = r'.\+'
     MAT_MINUS = r'.-'
     MAT_MUL = r'.\*'
     MAT_DIV = r'./'
 
-    ASSIGN = r'='
+    # Assign operators
     ADD_ASSIGN = r'\+='
     SUB_ASSIGN = r'-='
     MUL_ASSIGN = r'\*='
     DIV_ASSIGN = r'/='
 
-    LESS = r'<'
-    GREATER = r'>'
+    # Comparison operators
     LEQ = r'<='
     GEQ = r'>='
-    NEQ = r'!='
     EQ = r'=='
+    NEQ = r'!='
 
-    OP_BRAC = r'\('
-    CL_BRAC = r'\)'
-    OP_SQ_BRAC = r'\['
-    CL_SQ_BRAC = r'\]'
-    OP_CRL_BRAC = r'\{'
-    CL_CRL_BRAC = r'\}'
-    RANGE = r':'
-    TRANSPOSE = r'\''
-    COMMA = r','
-    SEMICOLON = ';'
+    # Strings
+    STR = r'"([^"\\]*(?:\\.[^"\\]*)*)?"|\'([^\'\\]*(?:\\.[^\'\\]*)*)?\''
 
+    # Floats
+    FLOAT = r'\.\d+([eE][+-]?\d+)?|\d+\.\d+([eE][+-]?\d+)?|\d+\.'
+
+    # Integers
     INT = r'\d+'
-    
 
+    # Error handling rule for illegal characters
+    def error(self, t):
+        print(f'({self.lineno}): !!! Illegal character: \'{t.value[0]}\' !!!')
+        self.index += 1
 
 
 if __name__ == '__main__':
@@ -71,4 +107,6 @@ if __name__ == '__main__':
     lexer = Scanner()
 
     for tok in lexer.tokenize(text):
-        print(tok)
+        print(
+            f'({tok.lineno}): token = \'{tok.type}\', lexem = \'{tok.value}\''
+        )
