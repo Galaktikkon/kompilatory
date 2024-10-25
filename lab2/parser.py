@@ -1,7 +1,7 @@
 from sly import Parser
-from scanner_sly import Scanner
+from scanner import Scanner
 
-
+# rekursja prawostronna
 
 class Mparser(Parser):
 

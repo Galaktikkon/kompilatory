@@ -1,6 +1,6 @@
 import sys
-from scanner_sly import Scanner
-from parser_sly import Mparser
+from scanner import Scanner
+from parser import Mparser
 
 
 if __name__ == '__main__':
