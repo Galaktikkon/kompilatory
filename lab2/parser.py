@@ -164,7 +164,7 @@ class Mparser(Parser):
     def element(self, p):
         pass
 
-    @_('FLOAT', 'INT', 'ID')
+    @_('FLOAT %prec UMINUS', 'INT %prec UMINUS', 'ID %prec UMINUS')
     def enumerable(self, p):
         pass
 
