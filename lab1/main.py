@@ -105,7 +105,7 @@ class Scanner(Lexer):
     NEQ = r"!="
 
     # Strings
-    STR = r'"([.*?\\]*(?:\\.[\\]*)*)?"'
+    STR = r'"([^"\\]*(?:\\.[^"\\]*)*)"'
 
     # Floats
     FLOAT = r"\.\d+([eE][+-]?\d+)?|\d+\.\d*([eE][+-]?\d+)?|\d+([eE][+-]?\d+)?"

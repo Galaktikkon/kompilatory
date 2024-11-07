@@ -12,22 +12,19 @@ class Mparser(Parser):
 
 
     precedence = (
-        ('nonassoc', "=", ADD_ASSIGN, SUB_ASSIGN, MUL_ASSIGN, DIV_ASSIGN, LEQ, GEQ, EQ, NEQ),
-        ('left', "+", "-", MAT_PLUS, MAT_MINUS),
-        ('left', "*", "/", MAT_MUL, MAT_DIV)
     )
 
 
     @_('body line')
-    def body(p):
+    def body(self, p):
         pass
     
     @_('line')
-    def body(p):
+    def body(self, p):
         pass
 
     @_('PRINT expr ";"')
-    def line(p):
+    def line(self, p):
         pass
 
     @_('ID "=" expr ";"',
@@ -35,51 +32,53 @@ class Mparser(Parser):
        'ID SUB_ASSIGN expr ";"',
        'ID MUL_ASSIGN expr ";"',
        'ID DIV_ASSIGN expr ";"')
-    def line(p):
+    def line(self, p):
         pass
 
     @_('BREAK ";"',
        'CONTINUE ";"')
-    def line(p):
+    def line(self, p):
         pass
 
-    @_('RETURN expr')
-    def line(p):
+    @_('RETURN expr ";"')
+    def line(self, p):
         pass
 
     @_('"{" body "}"')
-    def line(p):
+    def line(self, p):
         pass
 
     @_('IF condition body',
        'WHILE condition body')
-    def line(p):
+    def line(self, p):
         pass
 
     @_('ELSE body')
-    def line(p):
+    def line(self, p):
         pass
 
     @_('"(" expr EQ expr ")"',
        '"(" expr NEQ expr ")"',
        '"(" expr LEQ expr ")"',
-       '"(" expr GEQ expr ")"')
-    def condition(p):
+       '"(" expr GEQ expr ")"',
+       '"(" expr "<" expr ")"',
+       '"(" expr ">" expr ")"')
+    def condition(self, p):
         pass
 
-    @_('FOR ID "=" INT ":" INT body')
-    def line(p):
+    @_('FOR ID "=" element ":" element body')
+    def line(self, p):
         pass
     
     @_('expr "+" term',
        'expr "-" term',
        'expr MAT_PLUS term',
        'expr MAT_MINUS term')
-    def expr(p):
+    def expr(self, p):
         pass
 
     @_('term')
-    def expr(p):
+    def expr(self, p):
         # return p.term
         pass
 
@@ -87,45 +86,44 @@ class Mparser(Parser):
        'term "/" factor',
        'term MAT_MUL factor',
        'term MAT_DIV factor')
-    def term(p):
+    def term(self, p):
         pass
 
     @_('factor')
-    def term(p):
+    def term(self, p):
         # return p.factor
         pass
     
     @_('factor "," element')
-    def factor(p):
+    def factor(self, p):
         pass
 
     @_('element')
-    def factor(p):
+    def factor(self, p):
         pass
 
     @_('ZEROS "(" INT ")"', 
        'EYE "(" INT ")"',
        'ONES "(" INT ")"')
-    def element(p):
+    def element(self, p):
         pass
 
     @_('FLOAT',
        'INT',
-       'STR')
-    def element(p):
+       'STR',
+       'ID')
+    def element(self, p):
         pass
 
     @_('"[" element "]"')
-    def element(p):
+    def element(self, p):
         pass
-
 
     @_('"[" factor "]"')
-    def element(p):
+    def element(self, p):
         pass
 
-    
     @_('"(" expr ")"')
-    def element(p):
+    def element(self, p):
         pass
     
