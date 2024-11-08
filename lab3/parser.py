@@ -21,10 +21,6 @@ class Mparser(Parser):
         ("right", ELSE),
     )
 
-    @_('lines')
-    def body(self, p):
-        pass
-
     @_('lines line')
     def lines(self, p):
         pass
@@ -70,7 +66,7 @@ class Mparser(Parser):
     def return_statement(self, p):
         pass
 
-    @_('"{" body "}"')
+    @_('"{" lines "}"')
     def line(self, p):
         pass
 

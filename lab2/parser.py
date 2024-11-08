@@ -10,7 +10,6 @@ class Mparser(Parser):
 
     debugfile = 'parser.out'
 
-
     precedence = (
         ('nonassoc', ":"),
         ('left', "+", "-", MAT_PLUS, MAT_MINUS),
@@ -21,22 +20,22 @@ class Mparser(Parser):
         ("right", ELSE),
     )
 
-    @_('lines')
-    def body(self, p):
-        pass
-
-    @_('lines line')
-    def lines(self, p):
-        pass
-    
-    @_('line')
+    @_('lines line',
+       'line')
     def lines(self, p):
         pass
 
-    @_('PRINT expr ";"')
+    @_('PRINT expr ";"',
+       'RETURN expr ";"')
     def line(self, p):
         pass
-    
+
+    @_('BREAK ";"',
+       'CONTINUE ";"')
+    def line(self, p):
+        pass
+
+
     @_('assignment ";"')
     def line(self, p):
         pass
@@ -53,24 +52,8 @@ class Mparser(Parser):
     def assignment(self, p):
         pass
 
-    @_('control_statement ";"')
-    def line(self, p):
-        pass
 
-    @_('BREAK',
-       'CONTINUE')
-    def control_statement(self, p):
-        pass
-
-    @_('return_statement ";"')
-    def line(self, p):
-        pass
-
-    @_('RETURN expr')
-    def return_statement(self, p):
-        pass
-
-    @_('"{" body "}"')
+    @_('"{" lines "}"')
     def line(self, p):
         pass
 
@@ -154,7 +137,7 @@ class Mparser(Parser):
     def element(self, p):
         pass
 
-    @_('"[" expr "]"')
+    @_('"[" element "]"')
     def element(self, p):
         pass
 
