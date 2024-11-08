@@ -49,7 +49,7 @@ class Mparser(Parser):
     def assignment(self, p):
         pass
 
-    @_('ID "[" factor "]" "=" expr')
+    @_('ID expr "=" expr')
     def assignment(self, p):
         pass
 
@@ -96,8 +96,8 @@ class Mparser(Parser):
     def statement(self, p):
         pass
 
-    @_('ID factor EQ expr',
-       'ID factor NEQ expr')
+    @_('ID expr EQ expr',
+       'ID expr NEQ expr')
     def statement(self, p):
         pass
 
@@ -117,29 +117,19 @@ class Mparser(Parser):
     def expr(self, p):
         pass
     
-    @_('expr "*"',
-       'expr "/" factor',
-       'expr MAT_MUL factor',
-       'expr MAT_DIV factor')
+    @_('expr "*" expr',
+       'expr "/" expr',
+       'expr MAT_MUL expr',
+       'expr MAT_DIV expr')
     def expr(self, p):
-        pass
-
-    @_('term')
-    def expr(self, p):
-        # return p.term
-        pass
-
-    @_('factor')
-    def term(self, p):
-        # return p.factor
         pass
     
-    @_('factor "," element')
-    def factor(self, p):
+    @_('expr "," element')
+    def expr(self, p):
         pass
 
     @_('element')
-    def factor(self, p):
+    def expr(self, p):
         pass
 
     @_('ZEROS "(" enumerable ")"', 
@@ -164,7 +154,7 @@ class Mparser(Parser):
     def element(self, p):
         pass
 
-    @_('"[" factor "]"')
+    @_('"[" expr "]"')
     def element(self, p):
         pass
 
