@@ -33,12 +33,8 @@ class Mparser(Parser):
     def lines(self, p):
         pass
 
-    @_('print_statement ";"')
+    @_('PRINT expr ";"')
     def line(self, p):
-        pass
-
-    @_('PRINT expr')
-    def print_statement(self, p):
         pass
     
     @_('assignment ";"')
@@ -82,8 +78,8 @@ class Mparser(Parser):
     def line(self, p):
         pass
 
-    @_('IF condition "{" body "}" ELSE "{" body "}" ',
-       'IF condition "{" body "}" %prec ELSE')
+    @_('IF condition line ELSE line ',
+       'IF condition line %prec ELSE')
     def if_statement(self, p):
         pass
 
@@ -109,31 +105,31 @@ class Mparser(Parser):
     def line(self, p):
         pass
 
-    @_('FOR ID "=" enumerable ":" enumerable "{" body "}"',
-       'WHILE condition "{" body "}"')
+    @_('FOR ID "=" enumerable ":" enumerable line',
+       'WHILE condition line')
     def loop(self, p):
         pass
     
-    @_('expr "+" term',
-       'expr "-" term',
-       'expr MAT_PLUS term',
-       'expr MAT_MINUS term')
+    @_('expr "+" expr',
+       'expr "-" expr',
+       'expr MAT_PLUS expr',
+       'expr MAT_MINUS expr')
+    def expr(self, p):
+        pass
+    
+    @_('expr "*"',
+       'expr "/" factor',
+       'expr MAT_MUL factor',
+       'expr MAT_DIV factor')
     def expr(self, p):
         pass
 
-    @_('term %prec')
+    @_('term')
     def expr(self, p):
         # return p.term
         pass
-        
-    @_('term "*" factor',
-       'term "/" factor',
-       'term MAT_MUL factor',
-       'term MAT_DIV factor')
-    def term(self, p):
-        pass
 
-    @_('factor %prec ","')
+    @_('factor')
     def term(self, p):
         # return p.factor
         pass
