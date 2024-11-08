@@ -12,9 +12,11 @@ class Mparser(Parser):
 
 
     precedence = (
-        ("left", ","),
+        ('nonassoc', ":"),
         ('left', "+", "-", MAT_PLUS, MAT_MINUS),
-        ('left', "*", "/",  MAT_MUL, MAT_DIV),
+        ('left',  MAT_MUL, MAT_DIV),
+        ('left', "*", "/"), 
+        ("left", ","),
         ('right', UMINUS), 
         ("right", ELSE),
     )
@@ -113,26 +115,20 @@ class Mparser(Parser):
         pass
     
     @_('expr "+" term',
-       'expr "-" term')
-    def expr(self, p):
-        pass
-
-    @_('expr MAT_PLUS term',
+       'expr "-" term',
+       'expr MAT_PLUS term',
        'expr MAT_MINUS term')
     def expr(self, p):
         pass
 
-    @_('term')
+    @_('term %prec')
     def expr(self, p):
         # return p.term
         pass
-
+        
     @_('term "*" factor',
-       'term "/" factor')
-    def term(self, p):
-        pass
-
-    @_('term MAT_MUL factor',
+       'term "/" factor',
+       'term MAT_MUL factor',
        'term MAT_DIV factor')
     def term(self, p):
         pass
@@ -156,7 +152,7 @@ class Mparser(Parser):
     def element(self, p):
         pass
 
-    @_('STR')
+    @_('STR', 'FLOAT %prec UMINUS')
     def element(self, p):
         pass
 
@@ -164,7 +160,7 @@ class Mparser(Parser):
     def element(self, p):
         pass
 
-    @_('FLOAT %prec UMINUS', 'INT %prec UMINUS', 'ID %prec UMINUS')
+    @_('INT %prec UMINUS', 'ID %prec UMINUS')
     def enumerable(self, p):
         pass
 
