@@ -10,12 +10,17 @@ E1 = [ [ 1, 2, 3],
        [ 4, 5, 6],
        [ 7, 8, 9] ];
 
-res1 = 60.500;
-res2 = 60.;
-res3 = .500;
-res4 = 60.52E2;
-res5 = .
-str1 = "H
+float_sep_dot = 60.500;
+float_int_dot = 60.;
+float_dot_int = .500;
+float_int_scnt = 60.52E2;
+float_int_scnt = 60.52E-2;
+float_int_scnt = 60.52e2;
+float_int_scnt = 60.52e-2;
+float_int_scnt = .52e-2;
+illegal_dot = .3
+float_scnt = 60e2
+multiline_str = "H
 e
 l
 l
@@ -26,7 +31,8 @@ o
 r
 l
 d";
-str2 = "\"Hello world\"";
+
+multuple_quote_str = "\"Hello world\"";
 
 if (m==n) { 
     if (m >= n) 

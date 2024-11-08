@@ -4,21 +4,6 @@ from sly import Lexer
 
 class Scanner(Lexer):
 
-    # Reserved keywords
-    reserved = {
-        "if": "IF",
-        "else": "ELSE",
-        "for": "FOR",
-        "while": "WHILE",
-        "break": "BREAK",
-        "continue": "CONTINUE",
-        "return": "RETURN",
-        "eye": "EYE",
-        "zeros": "ZEROS",
-        "ones": "ONES",
-        "print": "PRINT",
-    }
-
     tokens = {
         ID,
         MAT_PLUS,
@@ -36,7 +21,18 @@ class Scanner(Lexer):
         FLOAT,
         INT,
         STR,
-    } | set(reserved.values())
+        IF,
+        ELSE,
+        FOR,
+        WHILE,
+        BREAK,
+        CONTINUE,
+        RETURN,
+        EYE,
+        ZEROS,
+        ONES,
+        PRINT,
+    }
 
     # Literals
     literals = {
@@ -105,10 +101,10 @@ class Scanner(Lexer):
     NEQ = r"!="
 
     # Strings
-    STR = r'\"(.*?)\"'
+    STR = r"\".*?\""
 
     # Floats
-    FLOAT = r"\.\d+([eE][+-]?\d+)?|\d+\.\d*([eE][+-]?\d+)?|\d+([eE][+-]?\d+)"
+    FLOAT = r"((\.\d+)|(\d+\.\d*))([eE][+-]?\d+)?|\d+([eE][+-]?\d+)"
 
     # Integers
     INT = r"\d+"
@@ -122,7 +118,7 @@ class Scanner(Lexer):
 if __name__ == "__main__":
 
     try:
-        filename = sys.argv[1] if len(sys.argv) > 1 else "examples\example.txt"
+        filename = sys.argv[1] if len(sys.argv) > 1 else "examples\\example.txt"
         file = open(filename, "r")
     except IOError:
         print("Cannot open {0} file".format(filename))
