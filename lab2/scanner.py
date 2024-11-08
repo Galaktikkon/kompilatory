@@ -108,7 +108,7 @@ class Scanner(Lexer):
     STR = r'\"(.*?)\"'
 
     # Floats
-    FLOAT = r"\.\d+([eE][+-]?\d+)?|\d+\.\d*([eE][+-]?\d+)?|\d+([eE][+-]?\d+)+"
+    FLOAT = r"\.\d+([eE][+-]?\d+)?|\d+\.\d*([eE][+-]?\d+)?|\d+([eE][+-]?\d+)"
 
     # Integers
     INT = r"\d+"
