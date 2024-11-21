@@ -10,73 +10,47 @@ class Mparser(Parser):
 
     debugfile = 'parser.out'
 
-
     precedence = (
         ('nonassoc', ":"),
+        ('nonassoc', "=", ADD_ASSIGN, SUB_ASSIGN, MUL_ASSIGN, DIV_ASSIGN),
+        ('nonassoc', EQ, NEQ, LEQ, GEQ, ">", "<"),
+        ("left", "{", "[", "("),
+        ("right", "}", "]", ")"),
         ('left', "+", "-", MAT_PLUS, MAT_MINUS),
         ('left',  MAT_MUL, MAT_DIV),
         ('left', "*", "/"), 
-        ("left", ","),
         ('right', UMINUS), 
+        ('left', IF),
         ("right", ELSE),
+        ("left", ","),
     )
 
-    @_('lines line')
-    def lines(self, p):
-        pass
-    
-    @_('line')
+    @_('lines line',
+       'line')
     def lines(self, p):
         pass
 
-    @_('PRINT expr ";"')
+    @_('PRINT expr ";"',
+       'RETURN expr ";"')
+    def line(self, p):
+        pass
+
+    @_('BREAK ";"',
+       'CONTINUE ";"')
     def line(self, p):
         pass
     
-    @_('assignment ";"')
-    def line(self, p):
-        pass
-    
-    @_('ID "=" expr',
-       'ID ADD_ASSIGN expr',
-       'ID SUB_ASSIGN expr',
-       'ID MUL_ASSIGN expr',
-       'ID DIV_ASSIGN expr')
-    def assignment(self, p):
-        pass
-
-    @_('ID expr "=" expr')
-    def assignment(self, p):
-        pass
-
-    @_('control_statement ";"')
+    @_('expressable "=" expr ";"',
+       'expressable ADD_ASSIGN expr ";"',
+       'expressable SUB_ASSIGN expr ";"',
+       'expressable MUL_ASSIGN expr ";"',
+       'expressable DIV_ASSIGN expr ";"')
     def line(self, p):
         pass
 
-    @_('BREAK',
-       'CONTINUE')
-    def control_statement(self, p):
-        pass
-
-    @_('return_statement ";"')
-    def line(self, p):
-        pass
-
-    @_('RETURN expr')
-    def return_statement(self, p):
-        pass
-
-    @_('"{" lines "}"')
-    def line(self, p):
-        pass
-
-    @_('if_statement')
-    def line(self, p):
-        pass
-
-    @_('IF condition line ELSE line ',
+    @_('IF condition line ELSE line %prec IF',
        'IF condition line %prec ELSE')
-    def if_statement(self, p):
+    def line(self, p):
         pass
 
     @_('"(" statement ")"')
@@ -97,35 +71,29 @@ class Mparser(Parser):
     def statement(self, p):
         pass
 
-    @_('loop')
-    def line(self, p):
-        pass
-
     @_('FOR ID "=" enumerable ":" enumerable line',
        'WHILE condition line')
-    def loop(self, p):
+    def line(self, p):
         pass
     
     @_('expr "+" expr',
        'expr "-" expr',
        'expr MAT_PLUS expr',
-       'expr MAT_MINUS expr')
-    def expr(self, p):
-        pass
-    
-    @_('expr "*" expr',
+       'expr MAT_MINUS expr',
+       'expr "*" expr',
        'expr "/" expr',
        'expr MAT_MUL expr',
        'expr MAT_DIV expr')
     def expr(self, p):
         pass
-    
-    @_('expr "," element')
+
+    @_('vector')
     def expr(self, p):
         pass
-
-    @_('element')
-    def expr(self, p):
+    
+    @_('element',
+       'vector "," element %prec ","')
+    def vector(self, p):
         pass
 
     @_('ZEROS "(" enumerable ")"', 
@@ -142,22 +110,39 @@ class Mparser(Parser):
     def element(self, p):
         pass
 
-    @_('INT %prec UMINUS', 'ID %prec UMINUS')
+    @_('INT %prec UMINUS')
     def enumerable(self, p):
+        pass
+
+    @_('expressable')
+    def enumerable(self, p):
+        pass
+
+    @_('ID %prec UMINUS',
+       'ID enum_list ')
+    def expressable(self, p):
+        pass
+
+    @_('"[" INT "," INT "]" %prec ","')
+    def enum_list(self, p):
         pass
 
     @_('ID "\'" ')
     def element(self, p):
         pass
 
-    @_('"[" expr "]"')
+    @_('"[" vector "]"')
     def element(self, p):
         pass
 
     @_('"(" expr ")"')
-    def element(self, p):
+    def expr(self, p):
         pass
 
     @_('"-" expr %prec UMINUS')
-    def element(self, p):
+    def expr(self, p):
+        pass
+
+    @_('"{" lines "}"')
+    def line(self, p):
         pass
