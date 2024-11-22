@@ -12,18 +12,13 @@ class Mparser(Parser):
     debugfile = "parser.out"
 
     precedence = (
-        ("nonassoc", ":"),
         ("nonassoc", "=", ADD_ASSIGN, SUB_ASSIGN, MUL_ASSIGN, DIV_ASSIGN),
         ("nonassoc", EQ, NEQ, LEQ, GEQ, ">", "<"),
-        ("left", "{", "[", "("),
-        ("right", "}", "]", ")"),
         ("left", "+", "-", MAT_PLUS, MAT_MINUS),
-        ("left", MAT_MUL, MAT_DIV),
-        ("left", "*", "/"),
+        ("left",  "*", "/", MAT_MUL, MAT_DIV),
         ("right", UMINUS),
         ("left", IF),
         ("right", ELSE),
-        ("left", ","),
     )
 
     @_("lines line", "line")
@@ -39,21 +34,17 @@ class Mparser(Parser):
         pass
 
     @_(
-        'expressable "=" expr ";"',
-        'expressable ADD_ASSIGN expr ";"',
-        'expressable SUB_ASSIGN expr ";"',
-        'expressable MUL_ASSIGN expr ";"',
-        'expressable DIV_ASSIGN expr ";"',
+        'lvalue "=" expr ";"',
+        'lvalue ADD_ASSIGN expr ";"',
+        'lvalue SUB_ASSIGN expr ";"',
+        'lvalue MUL_ASSIGN expr ";"',
+        'lvalue DIV_ASSIGN expr ";"',
     )
     def line(self, p):
         pass
 
-    @_("IF condition line ELSE line %prec IF", "IF condition line %prec ELSE")
+    @_('IF "(" condition ")" line ELSE line %prec IF', 'IF "(" condition ")" line %prec ELSE')
     def line(self, p):
-        pass
-
-    @_('"(" statement ")"')
-    def condition(self, p):
         pass
 
     @_(
@@ -64,14 +55,10 @@ class Mparser(Parser):
         'expr "<" expr',
         'expr ">" expr',
     )
-    def statement(self, p):
+    def condition(self, p):
         pass
 
-    @_("ID expr EQ expr", "ID expr NEQ expr")
-    def statement(self, p):
-        pass
-
-    @_('FOR ID "=" enumerable ":" enumerable line', "WHILE condition line")
+    @_('FOR ID "=" enumerable ":" enumerable line', 'WHILE "(" condition ")" line')
     def line(self, p):
         pass
 
@@ -92,7 +79,7 @@ class Mparser(Parser):
     def expr(self, p):
         pass
 
-    @_("element", 'vector "," element %prec ","')
+    @_("element", 'vector "," element')
     def vector(self, p):
         pass
 
@@ -100,27 +87,19 @@ class Mparser(Parser):
     def element(self, p):
         pass
 
-    @_("STR", "FLOAT %prec UMINUS")
+    @_("STR", "FLOAT", "enumerable")
     def element(self, p):
         pass
 
-    @_("enumerable")
-    def element(self, p):
-        pass
-
-    @_("INT %prec UMINUS")
+    @_("INT", "lvalue")
     def enumerable(self, p):
         pass
 
-    @_("expressable")
-    def enumerable(self, p):
+    @_("ID", "ID enum_list ")
+    def lvalue(self, p):
         pass
 
-    @_("ID %prec UMINUS", "ID enum_list ")
-    def expressable(self, p):
-        pass
-
-    @_('"[" INT "," INT "]" %prec ","')
+    @_('"[" enumerable "," enumerable "]"')
     def enum_list(self, p):
         pass
 
