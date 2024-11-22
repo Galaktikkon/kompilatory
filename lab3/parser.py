@@ -1,5 +1,6 @@
 from sly import Parser
 from scanner import Scanner
+import AST
 
 # rekursja prawostronna
 # obliczenia robić poziomami (dodawanie liczbowe i dodawanie macierzowe w jednym priorytecie)
@@ -30,13 +31,25 @@ class Mparser(Parser):
     def lines(self, p):
         return ("lines", p[0], p[1]) if len(p) > 1 else p[0]
 
-    @_('PRINT expr ";"', 'RETURN expr ";"')
+    @_('RETURN expr ";"')
     def line(self, p):
-        return (p[0], p.expr)
+        # return (p[0], p.expr)
+        return AST.Return(p)
+    
+    @_('PRINT expr ";"')
+    def line(self, p):
+        # return (p[0], p.expr)
+        return AST.Print(p)
 
-    @_('BREAK ";"', 'CONTINUE ";"')
+    @_('BREAK ";"')
     def line(self, p):
-        return (p[0],)
+        # return (p[0],)
+        return AST.Break(p)
+    
+    @_('CONTINUE ";"')
+    def line(self, p):
+        # return (p[0],)
+        return AST.Continue(p)
 
     @_(
         'expressable "=" expr ";"',
@@ -46,18 +59,21 @@ class Mparser(Parser):
         'expressable DIV_ASSIGN expr ";"',
     )
     def line(self, p):
-        return ("assign", p.expressable, p.expr)
+        # return ("assign", p.expressable, p.expr)
+        return AST.Assignment(p)
 
     @_("IF condition line ELSE line %prec IF", "IF condition line %prec ELSE")
     def line(self, p):
-        if len(p) == 6:
-            return ("if_else", p.condition, p.line0, p.line1)
-        else:
-            return ("if", p.condition, p.line)
+        # if len(p) == 6:
+            # return ("if_else", p.condition, p.line0, p.line1)
+        # else:
+            # return ("if", p.condition, p.line)
+        return AST.IfElse(p)
 
     @_('"(" statement ")"')
     def condition(self, p):
-        return ("condition", p.statement)
+        # return ("condition", p.statement)
+        return AST.Condition(p)
 
     @_(
         "expr EQ expr",
@@ -74,25 +90,35 @@ class Mparser(Parser):
     def statement(self, p):
         return ("assign_op", p.ID, p.expr0, p.expr1)
 
-    @_('FOR ID "=" enumerable ":" enumerable line', "WHILE condition line")
+    @_('FOR ID "=" enumerable ":" enumerable line')
     def line(self, p):
-        if p[0] == "FOR":
-            return ("for", p.ID, p.enumerable0, p.enumerable1, p.line)
-        else:
-            return ("while", p.condition, p.line)
+        # return ("for", p.ID, p.enumerable0, p.enumerable1, p.line)
+        return AST.ForLoop(p)
+    
+    @_("WHILE condition line")
+    def line(self, p):
+        # return ("while", p.condition, p.line)
+        return AST.WhileLoop(p)
 
     @_(
         'expr "+" expr',
         'expr "-" expr',
-        "expr MAT_PLUS expr",
-        "expr MAT_MINUS expr",
         'expr "*" expr',
         'expr "/" expr',
+    )
+    def expr(self, p):
+        # return (p[1], p.expr0, p.expr1)
+        return AST.BinOp(p)
+    
+    @_(
+        "expr MAT_PLUS expr",
+        "expr MAT_MINUS expr",
         "expr MAT_MUL expr",
         "expr MAT_DIV expr",
     )
     def expr(self, p):
-        return (p[1], p.expr0, p.expr1)
+        # return (p[1], p.expr0, p.expr1)
+        return AST.MatrixOp(p)
 
     @_("vector")
     def expr(self, p):
@@ -106,9 +132,15 @@ class Mparser(Parser):
     def element(self, p):
         return (p[0], p.enumerable)
 
-    @_("STR", "FLOAT %prec UMINUS")
+    @_("FLOAT %prec UMINUS")
     def element(self, p):
-        return ("literal", p[0])
+        # return ("literal", p[0])
+        return AST.FloatLiteral(p)
+    
+    @_("STR")
+    def element(self, p):
+        # return ("literal", p[0])
+        return AST.StringLiteral(p)
 
     @_("enumerable")
     def element(self, p):
@@ -116,7 +148,8 @@ class Mparser(Parser):
 
     @_("INT %prec UMINUS")
     def enumerable(self, p):
-        return ("int", p.INT)
+        # return ("int", p.INT)
+        return AST.IntLiteral(p)
 
     @_("expressable")
     def enumerable(self, p):
@@ -124,7 +157,8 @@ class Mparser(Parser):
 
     @_("ID %prec UMINUS", "ID enum_list ")
     def expressable(self, p):
-        return ("variable", p.ID) if len(p) == 1 else ("enum_list", p.ID, p.enum_list)
+        #return ("variable", p.ID) if len(p) == 1 else ("enum_list", p.ID, p.enum_list)
+        return AST.Variable(p)
 
     @_('"[" INT "," INT "]" %prec ","')
     def enum_list(self, p):
@@ -132,11 +166,13 @@ class Mparser(Parser):
 
     @_('ID "\'" ')
     def element(self, p):
-        return ("transpose", p.ID)
+        # return ("transpose", p.ID)
+        return AST.Transpose(p)
 
     @_('"[" vector "]"')
     def element(self, p):
-        return ("vector", p.vector)
+        # return ("vector", p.vector)
+        return AST.Vector(p)
 
     @_('"(" expr ")"')
     def expr(self, p):
@@ -144,8 +180,10 @@ class Mparser(Parser):
 
     @_('"-" expr %prec UMINUS')
     def expr(self, p):
-        return ("uminus", p.expr)
+        # return ("uminus", p.expr)
+        return AST.UnaryOp(p)
 
     @_('"{" lines "}"')
     def line(self, p):
-        return ("block", p.lines)
+        # return ("block", p.lines)
+        return AST.Block(p)
