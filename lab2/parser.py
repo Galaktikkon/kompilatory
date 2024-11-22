@@ -1,5 +1,5 @@
 from sly import Parser
-from scanner import Scanner
+from ..lab1.main import Scanner
 
 # rekursja prawostronna
 # obliczenia robić poziomami (dodawanie liczbowe i dodawanie macierzowe w jednym priorytecie)
@@ -15,9 +15,9 @@ class Mparser(Parser):
         ("nonassoc", "=", ADD_ASSIGN, SUB_ASSIGN, MUL_ASSIGN, DIV_ASSIGN),
         ("nonassoc", EQ, NEQ, LEQ, GEQ, ">", "<"),
         ("left", "+", "-", MAT_PLUS, MAT_MINUS),
-        ("left",  "*", "/", MAT_MUL, MAT_DIV),
+        ("left", "*", "/", MAT_MUL, MAT_DIV),
         ("right", UMINUS),
-        ("left", IF),
+        ("left", IFX),
         ("right", ELSE),
     )
 
@@ -43,7 +43,10 @@ class Mparser(Parser):
     def line(self, p):
         pass
 
-    @_('IF "(" condition ")" line ELSE line %prec IF', 'IF "(" condition ")" line %prec ELSE')
+    @_(
+        'IFX "(" condition ")" line ELSE line %prec IFX',
+        'IFX "(" condition ")" line %prec ELSE',
+    )
     def line(self, p):
         pass
 

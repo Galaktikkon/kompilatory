@@ -1,5 +1,5 @@
 from sly import Parser
-from scanner import Scanner
+from ..lab1.main import Scanner
 import AST
 
 # rekursja prawostronna
@@ -35,7 +35,7 @@ class Mparser(Parser):
     def line(self, p):
         # return (p[0], p.expr)
         return AST.Return(p)
-    
+
     @_('PRINT expr ";"')
     def line(self, p):
         # return (p[0], p.expr)
@@ -45,7 +45,7 @@ class Mparser(Parser):
     def line(self, p):
         # return (p[0],)
         return AST.Break(p)
-    
+
     @_('CONTINUE ";"')
     def line(self, p):
         # return (p[0],)
@@ -65,9 +65,9 @@ class Mparser(Parser):
     @_("IF condition line ELSE line %prec IF", "IF condition line %prec ELSE")
     def line(self, p):
         # if len(p) == 6:
-            # return ("if_else", p.condition, p.line0, p.line1)
+        # return ("if_else", p.condition, p.line0, p.line1)
         # else:
-            # return ("if", p.condition, p.line)
+        # return ("if", p.condition, p.line)
         return AST.IfElse(p)
 
     @_('"(" statement ")"')
@@ -94,7 +94,7 @@ class Mparser(Parser):
     def line(self, p):
         # return ("for", p.ID, p.enumerable0, p.enumerable1, p.line)
         return AST.ForLoop(p)
-    
+
     @_("WHILE condition line")
     def line(self, p):
         # return ("while", p.condition, p.line)
@@ -109,7 +109,7 @@ class Mparser(Parser):
     def expr(self, p):
         # return (p[1], p.expr0, p.expr1)
         return AST.BinOp(p)
-    
+
     @_(
         "expr MAT_PLUS expr",
         "expr MAT_MINUS expr",
@@ -136,7 +136,7 @@ class Mparser(Parser):
     def element(self, p):
         # return ("literal", p[0])
         return AST.FloatLiteral(p)
-    
+
     @_("STR")
     def element(self, p):
         # return ("literal", p[0])
@@ -157,7 +157,7 @@ class Mparser(Parser):
 
     @_("ID %prec UMINUS", "ID enum_list ")
     def expressable(self, p):
-        #return ("variable", p.ID) if len(p) == 1 else ("enum_list", p.ID, p.enum_list)
+        # return ("variable", p.ID) if len(p) == 1 else ("enum_list", p.ID, p.enum_list)
         return AST.Variable(p)
 
     @_('"[" INT "," INT "]" %prec ","')
