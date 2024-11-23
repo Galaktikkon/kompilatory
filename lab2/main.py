@@ -1,5 +1,5 @@
 import sys
-from ..lab1.main import Scanner
+from scanner import Scanner
 from parser import Mparser
 
 

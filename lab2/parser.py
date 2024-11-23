@@ -1,5 +1,5 @@
 from sly import Parser
-from ..lab1.main import Scanner
+from scanner import Scanner
 
 # rekursja prawostronna
 # obliczenia robić poziomami (dodawanie liczbowe i dodawanie macierzowe w jednym priorytecie)
