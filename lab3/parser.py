@@ -22,21 +22,20 @@ class Mparser(Parser):
         ("right", ELSE),
     )
 
-    @_("lines line")
+    @_("lines line", "line")
     def lines(self, p):
-        return AST.Lines(p[0], p[1])
-
-    @_("line")
-    def lines(self, p):
-        return AST.Line(p[0])
+        if len(p) == 1:
+            return AST.Lines(p[0])
+        else:
+            return AST.Lines(p[1], p[0])
 
     @_('PRINT expr ";"')
     def line(self, p):
-        return AST.Print(p[0])
+        return AST.Print(p[1])
 
     @_('RETURN expr ";"')
     def line(self, p):
-        return AST.Return(p[0])
+        return AST.Return(p[1])
 
     @_('BREAK ";"')
     def line(self, p):
@@ -61,7 +60,10 @@ class Mparser(Parser):
         'IFX "(" condition ")" line %prec ELSE',
     )
     def line(self, p):
-        pass
+        if len(p) == 7:
+            return AST.IfElse(p[2], p[4], p[6])
+        else:
+            return AST.IfElse(p[2], p[4])
 
     @_(
         "expr EQ expr",
@@ -72,7 +74,7 @@ class Mparser(Parser):
         'expr ">" expr',
     )
     def condition(self, p):
-        AST.BinOp(p[1], p[0], p[2])
+        return AST.BinOp(p[1], p[0], p[2])
 
     @_('FOR ID "=" enumerable ":" enumerable line')
     def line(self, p):
@@ -97,48 +99,66 @@ class Mparser(Parser):
 
     @_("vector")
     def expr(self, p):
-        pass
+        return p[0]
 
     @_("element", 'vector "," element')
     def vector(self, p):
-        pass
+        if len(p) == 1:
+            return AST.Vector(p[0])
+        else:
+            return AST.VectorList(p[2], p[0])
 
     @_('ZEROS "(" enumerable ")"', 'EYE "(" enumerable ")"', 'ONES "(" enumerable ")"')
     def element(self, p):
-        pass
+        return AST.MatrixOp(p[0], p[2])
 
-    @_("STR", "FLOAT", "enumerable")
+    @_("enumerable")
     def element(self, p):
-        pass
+        return p[0]
 
-    @_("INT", "lvalue")
+    @_("STR")
+    def element(self, p):
+        return AST.String(p[0])
+
+    @_("FLOAT")
+    def element(self, p):
+        return AST.FloatNum(p[0])
+
+    @_("INT")
     def enumerable(self, p):
-        pass
+        return AST.IntNum(p[0])
+
+    @_("lvalue")
+    def enumerable(self, p):
+        return p[0]
 
     @_("ID", "ID enum_list ")
     def lvalue(self, p):
-        pass
+        if len(p) == 1:
+            return AST.EnumList(p[0])
+        else:
+            return AST.EnumList(p[0], p[1])
 
     @_('"[" enumerable "," enumerable "]"')
     def enum_list(self, p):
-        pass
+        return AST.EnumerableList(p[1], p[3])
 
     @_('ID "\'" ')
     def element(self, p):
-        pass
+        return AST.Transpose(p[0])
 
     @_('"[" vector "]"')
     def element(self, p):
-        pass
+        return p[1]
 
     @_('"(" expr ")"')
     def expr(self, p):
-        pass
+        return p[1]
 
     @_('"-" expr %prec UMINUS')
     def expr(self, p):
-        AST.UnaryOp(p[0], p[1])
+        return AST.UnaryOp(p[0], p[1])
 
     @_('"{" lines "}"')
     def line(self, p):
-        pass
+        return p[1]

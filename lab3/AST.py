@@ -1,30 +1,32 @@
 class Node(object):
-    def printTree(self, level=0):
+    def print_tree(self, level=0):
         raise NotImplementedError("printTree not implemented for this class")
 
 
 class Lines(Node):
-    def __init__(self, lines, line=None):
+    def __init__(self, line, lines=None):
         self.lines = lines
         self.line = line
 
 
-class Line(Node):
-    def __init__(self, line):
-        self.line = line
+class Print(Node):
+    def __init__(self, expr):
+        self.expr = expr
 
 
-class BinOp(Node):
-    def __init__(self, operator, left, right):
-        self.operator = operator
-        self.left = left
-        self.right = right
+class Return(Node):
+    def __init__(self, expr):
+        self.expr = expr
 
 
-class UnaryOp(Node):
-    def __init__(self, op, operand):
-        self.operator = op
-        self.operand = operand
+class Break(Node):
+    def __init__(self):
+        super().__init__()
+
+
+class Continue(Node):
+    def __init__(self):
+        super().__init__()
 
 
 class Assignment(Node):
@@ -41,6 +43,13 @@ class IfElse(Node):
         self.else_branch = else_branch
 
 
+class BinOp(Node):
+    def __init__(self, op, left, right):
+        self.op = op
+        self.left = left
+        self.right = right
+
+
 class ForLoop(Node):
     def __init__(self, variable, start, end, body):
         self.variable = variable
@@ -55,52 +64,24 @@ class WhileLoop(Node):
         self.body = body
 
 
-class Block(Node):
-    def __init__(self, statements):
-        self.statements = statements
-
-    def printTree(self, indent=""):
-        print(f"{indent}{{")
-        for stmt in self.statements:
-            stmt.printTree(indent + "  ")
-        print(f"{indent}}}")
-
-
-class Break(Node):
-    def __init__(self):
-        super().__init__()
-
-
-class Continue(Node):
-    def __init__(self):
-        super().__init__()
-
-
-class Return(Node):
-    def __init__(self, expr):
-        self.expr = expr
-
-
-class Print(Node):
-    def __init__(self, expr):
-        self.expr = expr
-
-
 class Vector(Node):
-    def __init__(self, elements):
-        self.elements = elements
+    def __init__(self, vector):
+        self.vector = vector
 
 
-class Transpose(Node):
-    def __init__(self, variable):
-        self.variable = variable
-
-    def printTree(self, indent=""):
-        print(f"{indent}TRANSPOSE")
-        self.variable.printTree(indent + "  ")
+class VectorList(Node):
+    def __init__(self, element, vector=None):
+        self.element = element
+        self.vector = vector
 
 
-class IntNum(Node):
+class MatrixOp(Node):
+    def __init__(self, type, enumerable):
+        self.type = type
+        self.enumerable = enumerable
+
+
+class String(Node):
     def __init__(self, value):
         self.value = value
 
@@ -110,11 +91,29 @@ class FloatNum(Node):
         self.value = value
 
 
-class String(Node):
+class IntNum(Node):
     def __init__(self, value):
         self.value = value
 
 
-class Identifier(Node):
-    def __init__(self, value):
-        self.value = value
+class EnumList(Node):
+    def __init__(self, identifier, enum_list=None):
+        self.identifier = identifier
+        self.enum_list = enum_list
+
+
+class EnumerableList(Node):
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+
+
+class Transpose(Node):
+    def __init__(self, identifier):
+        self.identifier = identifier
+
+
+class UnaryOp(Node):
+    def __init__(self, op, operand):
+        self.operator = op
+        self.operand = operand
