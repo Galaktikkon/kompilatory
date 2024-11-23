@@ -1,5 +1,5 @@
 from sly import Parser
-from ..lab1.main import Scanner
+from scanner import Scanner
 import AST
 
 # rekursja prawostronna
@@ -13,67 +13,55 @@ class Mparser(Parser):
     debugfile = "parser.out"
 
     precedence = (
-        ("nonassoc", ":"),
         ("nonassoc", "=", ADD_ASSIGN, SUB_ASSIGN, MUL_ASSIGN, DIV_ASSIGN),
         ("nonassoc", EQ, NEQ, LEQ, GEQ, ">", "<"),
-        ("left", "{", "[", "("),
-        ("right", "}", "]", ")"),
         ("left", "+", "-", MAT_PLUS, MAT_MINUS),
-        ("left", MAT_MUL, MAT_DIV),
-        ("left", "*", "/"),
+        ("left", "*", "/", MAT_MUL, MAT_DIV),
         ("right", UMINUS),
-        ("left", IF),
+        ("left", IFX),
         ("right", ELSE),
-        ("left", ","),
     )
 
-    @_("lines line", "line")
+    @_("lines line")
     def lines(self, p):
-        return ("lines", p[0], p[1]) if len(p) > 1 else p[0]
+        return AST.Lines(p[0], p[1])
 
-    @_('RETURN expr ";"')
-    def line(self, p):
-        # return (p[0], p.expr)
-        return AST.Return(p)
+    @_("line")
+    def lines(self, p):
+        return AST.Line(p[0])
 
     @_('PRINT expr ";"')
     def line(self, p):
-        # return (p[0], p.expr)
-        return AST.Print(p)
+        return AST.Print(p[0])
+
+    @_('RETURN expr ";"')
+    def line(self, p):
+        return AST.Return(p[0])
 
     @_('BREAK ";"')
     def line(self, p):
-        # return (p[0],)
-        return AST.Break(p)
+        return AST.Break()
 
     @_('CONTINUE ";"')
     def line(self, p):
-        # return (p[0],)
-        return AST.Continue(p)
+        return AST.Continue()
 
     @_(
-        'expressable "=" expr ";"',
-        'expressable ADD_ASSIGN expr ";"',
-        'expressable SUB_ASSIGN expr ";"',
-        'expressable MUL_ASSIGN expr ";"',
-        'expressable DIV_ASSIGN expr ";"',
+        'lvalue "=" expr ";"',
+        'lvalue ADD_ASSIGN expr ";"',
+        'lvalue SUB_ASSIGN expr ";"',
+        'lvalue MUL_ASSIGN expr ";"',
+        'lvalue DIV_ASSIGN expr ";"',
     )
     def line(self, p):
-        # return ("assign", p.expressable, p.expr)
-        return AST.Assignment(p)
+        return AST.Assignment(p[0], p[1], p[2])
 
-    @_("IF condition line ELSE line %prec IF", "IF condition line %prec ELSE")
+    @_(
+        'IFX "(" condition ")" line ELSE line %prec IFX',
+        'IFX "(" condition ")" line %prec ELSE',
+    )
     def line(self, p):
-        # if len(p) == 6:
-        # return ("if_else", p.condition, p.line0, p.line1)
-        # else:
-        # return ("if", p.condition, p.line)
-        return AST.IfElse(p)
-
-    @_('"(" statement ")"')
-    def condition(self, p):
-        # return ("condition", p.statement)
-        return AST.Condition(p)
+        pass
 
     @_(
         "expr EQ expr",
@@ -83,107 +71,74 @@ class Mparser(Parser):
         'expr "<" expr',
         'expr ">" expr',
     )
-    def statement(self, p):
-        return (p[1], p.expr0, p.expr1)
-
-    @_("ID expr EQ expr", "ID expr NEQ expr")
-    def statement(self, p):
-        return ("assign_op", p.ID, p.expr0, p.expr1)
+    def condition(self, p):
+        AST.BinOp(p[1], p[0], p[2])
 
     @_('FOR ID "=" enumerable ":" enumerable line')
     def line(self, p):
-        # return ("for", p.ID, p.enumerable0, p.enumerable1, p.line)
-        return AST.ForLoop(p)
+        return AST.ForLoop(p[1], p[3], p[5], p[6])
 
-    @_("WHILE condition line")
+    @_('WHILE "(" condition ")" line')
     def line(self, p):
-        # return ("while", p.condition, p.line)
-        return AST.WhileLoop(p)
+        return AST.WhileLoop(p[2], p[4])
 
     @_(
         'expr "+" expr',
         'expr "-" expr',
-        'expr "*" expr',
-        'expr "/" expr',
-    )
-    def expr(self, p):
-        # return (p[1], p.expr0, p.expr1)
-        return AST.BinOp(p)
-
-    @_(
         "expr MAT_PLUS expr",
         "expr MAT_MINUS expr",
+        'expr "*" expr',
+        'expr "/" expr',
         "expr MAT_MUL expr",
         "expr MAT_DIV expr",
     )
     def expr(self, p):
-        # return (p[1], p.expr0, p.expr1)
-        return AST.MatrixOp(p)
+        return AST.BinOp(p[1], p[0], p[2])
 
     @_("vector")
     def expr(self, p):
-        return p.vector
+        pass
 
-    @_("element", 'vector "," element %prec ","')
+    @_("element", 'vector "," element')
     def vector(self, p):
-        return ("vector", p.element) if len(p) == 1 else ("vector", p[0], p[2])
+        pass
 
     @_('ZEROS "(" enumerable ")"', 'EYE "(" enumerable ")"', 'ONES "(" enumerable ")"')
     def element(self, p):
-        return (p[0], p.enumerable)
+        pass
 
-    @_("FLOAT %prec UMINUS")
+    @_("STR", "FLOAT", "enumerable")
     def element(self, p):
-        # return ("literal", p[0])
-        return AST.FloatLiteral(p)
+        pass
 
-    @_("STR")
-    def element(self, p):
-        # return ("literal", p[0])
-        return AST.StringLiteral(p)
-
-    @_("enumerable")
-    def element(self, p):
-        return p.enumerable
-
-    @_("INT %prec UMINUS")
+    @_("INT", "lvalue")
     def enumerable(self, p):
-        # return ("int", p.INT)
-        return AST.IntLiteral(p)
+        pass
 
-    @_("expressable")
-    def enumerable(self, p):
-        return p.expressable
+    @_("ID", "ID enum_list ")
+    def lvalue(self, p):
+        pass
 
-    @_("ID %prec UMINUS", "ID enum_list ")
-    def expressable(self, p):
-        # return ("variable", p.ID) if len(p) == 1 else ("enum_list", p.ID, p.enum_list)
-        return AST.Variable(p)
-
-    @_('"[" INT "," INT "]" %prec ","')
+    @_('"[" enumerable "," enumerable "]"')
     def enum_list(self, p):
-        return ("range", p[1], p[3])
+        pass
 
     @_('ID "\'" ')
     def element(self, p):
-        # return ("transpose", p.ID)
-        return AST.Transpose(p)
+        pass
 
     @_('"[" vector "]"')
     def element(self, p):
-        # return ("vector", p.vector)
-        return AST.Vector(p)
+        pass
 
     @_('"(" expr ")"')
     def expr(self, p):
-        return p.expr
+        pass
 
     @_('"-" expr %prec UMINUS')
     def expr(self, p):
-        # return ("uminus", p.expr)
-        return AST.UnaryOp(p)
+        AST.UnaryOp(p[0], p[1])
 
     @_('"{" lines "}"')
     def line(self, p):
-        # return ("block", p.lines)
-        return AST.Block(p)
+        pass
