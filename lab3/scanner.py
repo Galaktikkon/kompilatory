@@ -83,10 +83,10 @@ class Scanner(Lexer):
     ID["print"] = PRINT
 
     # Matrix operators
-    MAT_PLUS = r".\+"
-    MAT_MINUS = r".-"
-    MAT_MUL = r".\*"
-    MAT_DIV = r"./"
+    MAT_PLUS = r"\.\+"
+    MAT_MINUS = r"\.-"
+    MAT_MUL = r"\.\*"
+    MAT_DIV = r"\./"
 
     # Assign operators
     ADD_ASSIGN = r"\+="
