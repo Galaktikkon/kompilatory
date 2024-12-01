@@ -113,12 +113,6 @@ class TreePrinter:
         if self.enum_list:
             self.enum_list.print_tree(indent)
 
-    @addToClass(AST.RefList)
-    def print_tree(self, indent=0):
-        self.left.print_tree(indent)
-        if self.right:
-            self.right.print_tree(indent)
-
     @addToClass(AST.Transpose)
     def print_tree(self, indent=0):
         print_with_indent(indent, "TRANSPOSE")
