@@ -70,9 +70,14 @@ class Vector(Node):
 
 
 class VectorList(Node):
-    def __init__(self, element, vector=None):
-        self.element = element
+    def __init__(self, vector, vectors=None):
         self.vector = vector
+        self.vectors = vectors
+
+
+class Matrix(Node):
+    def __init__(self, vectors):
+        self.vectors = vectors
 
 
 class MatrixOp(Node):

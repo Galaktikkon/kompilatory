@@ -97,20 +97,20 @@ class Mparser(Parser):
     def expr(self, p):
         return AST.BinOp(p[1], p[0], p[2])
 
-    @_("vector")
+    @_("vector", "matrix", "element")
     def expr(self, p):
         return p[0]
 
-    @_("element", 'vector "," element')
-    def vector(self, p):
+    @_("vector", 'vectors "," vector')
+    def vectors(self, p):
         if len(p) == 1:
             return AST.Vector(p[0])
         else:
             return AST.VectorList(p[2], p[0])
 
-    @_('"[" vector "]"')
-    def element(self, p):
-        return p[1]
+    @_('"[" vectors "]"')
+    def matrix(self, p):
+        return AST.Matrix(p[1])
 
     @_('ZEROS "(" enumerable ")"', 'EYE "(" enumerable ")"', 'ONES "(" enumerable ")"')
     def element(self, p):
@@ -136,7 +136,7 @@ class Mparser(Parser):
     def enumerable(self, p):
         return p[0]
 
-    @_("ID", "ID enum_list ")
+    @_("ID", "ID vector ")
     def lvalue(self, p):
         if len(p) == 1:
             return AST.LValue(p[0])
@@ -144,7 +144,7 @@ class Mparser(Parser):
             return AST.RefValue(p[0], p[1])
 
     @_('"[" enum_sequence "]"')
-    def enum_list(self, p):
+    def vector(self, p):
         return p[1]
 
     @_("enumerable", 'enumerable "," enum_sequence')

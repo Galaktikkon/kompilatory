@@ -14,21 +14,19 @@
 |  E1
 |  VECTOR
 |  |  VECTOR
-|  |  |  VECTOR
-|  |  |  |  VECTOR
-|  |  |  |  |  1
-|  |  |  |  2
-|  |  |  3
+|  |  1
+|  |  2
+|  |  3
 |  |  VECTOR
-|  |  |  VECTOR
-|  |  |  |  4
-|  |  |  5
+|  |  4
 |  |  6
-|  VECTOR
 |  |  VECTOR
-|  |  |  7
+|  |  7
 |  |  8
-|  9
+|  |  9
+|  |  5
+|  |  VECTOR
+|  |  1
 =
 |  REF
 |  |  A
