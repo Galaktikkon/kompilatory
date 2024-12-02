@@ -25,11 +25,19 @@ class Mparser(Parser):
     def lines(self, p):
         pass
 
-    @_('PRINT expr ";"', 'RETURN expr ";"')
+    @_('PRINT expr ";"')
     def line(self, p):
         pass
 
-    @_('BREAK ";"', 'CONTINUE ";"')
+    @_('RETURN expr ";"')
+    def line(self, p):
+        pass
+
+    @_('BREAK ";"')
+    def line(self, p):
+        pass
+
+    @_('CONTINUE ";"')
     def line(self, p):
         pass
 
@@ -61,7 +69,11 @@ class Mparser(Parser):
     def condition(self, p):
         pass
 
-    @_('FOR ID "=" enumerable ":" enumerable line', 'WHILE "(" condition ")" line')
+    @_('FOR ID "=" enumerable ":" enumerable line')
+    def line(self, p):
+        pass
+
+    @_('WHILE "(" condition ")" line')
     def line(self, p):
         pass
 
@@ -78,39 +90,55 @@ class Mparser(Parser):
     def expr(self, p):
         pass
 
-    @_("vector")
+    @_("vector", "matrix", "element")
     def expr(self, p):
         pass
 
-    @_("element", 'vector "," element')
-    def vector(self, p):
+    @_("vector", 'vectors "," vector')
+    def vectors(self, p):
+        pass
+
+    @_('"[" vectors "]"')
+    def matrix(self, p):
         pass
 
     @_('ZEROS "(" enumerable ")"', 'EYE "(" enumerable ")"', 'ONES "(" enumerable ")"')
     def element(self, p):
         pass
 
-    @_("STR", "FLOAT", "enumerable")
+    @_("enumerable")
     def element(self, p):
         pass
 
-    @_("INT", "lvalue")
+    @_("STR")
+    def element(self, p):
+        pass
+
+    @_("FLOAT")
+    def element(self, p):
+        pass
+
+    @_("INT")
     def enumerable(self, p):
         pass
 
-    @_("ID", "ID enum_list ")
+    @_("lvalue")
+    def enumerable(self, p):
+        pass
+
+    @_("ID", "ID vector ")
     def lvalue(self, p):
         pass
 
-    @_('"[" enumerable "," enumerable "]"')
-    def enum_list(self, p):
+    @_('"[" enum_sequence "]"')
+    def vector(self, p):
+        pass
+
+    @_("enumerable", 'enumerable "," enum_sequence')
+    def enum_sequence(self, p):
         pass
 
     @_('ID "\'" ')
-    def element(self, p):
-        pass
-
-    @_('"[" vector "]"')
     def element(self, p):
         pass
 
