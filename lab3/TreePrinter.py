@@ -82,14 +82,14 @@ class TreePrinter:
     @addToClass(AST.Vector)
     def print_tree(self, indent=0):
         print_with_indent(indent, "VECTOR")
-        self.vector.print_tree(indent)
+        self.vector.print_tree(indent + 1)
 
     @addToClass(AST.VectorList)
     def print_tree(self, indent=0):
         if self.vectors:
             self.vectors.print_tree(indent)
             print_with_indent(indent, "VECTOR")
-        self.vector.print_tree(indent)
+        self.vector.print_tree(indent + 1)
 
     @addToClass(AST.Matrix)
     def print_tree(self, indent=0):
