@@ -16,7 +16,7 @@ def print_with_indent(indent, msg):
 class TreePrinter:
     @addToClass(AST.Node)
     def print_tree(self, indent=0):
-        raise NotImplementedError("printTree not implemented for this class CHUJ")
+        raise NotImplementedError("printTree not implemented for this class")
 
     @addToClass(AST.Lines)
     def print_tree(self, indent=0):
@@ -107,9 +107,21 @@ class TreePrinter:
     def print_tree(self, indent=0):
         print_with_indent(indent, str(self.value))
 
-    @addToClass(AST.EnumList)
+    @addToClass(AST.LValue)
     def print_tree(self, indent=0):
         print_with_indent(indent, str(self.identifier))
+        if self.enum_list:
+            self.enum_list.print_tree(indent)
+
+    @addToClass(AST.RefValue)
+    def print_tree(self, indent=0):
+        print_with_indent(indent, "REF")
+        print_with_indent(indent + 1, str(self.identifier))
+        self.ref.print_tree(indent + 1)
+
+    @addToClass(AST.EnumerableList)
+    def print_tree(self, indent=0):
+        self.enumerable.print_tree(indent)
         if self.enum_list:
             self.enum_list.print_tree(indent)
 

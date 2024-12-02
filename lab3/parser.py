@@ -108,6 +108,10 @@ class Mparser(Parser):
         else:
             return AST.VectorList(p[2], p[0])
 
+    @_('"[" vector "]"')
+    def element(self, p):
+        return p[1]
+
     @_('ZEROS "(" enumerable ")"', 'EYE "(" enumerable ")"', 'ONES "(" enumerable ")"')
     def element(self, p):
         return AST.MatrixOp(p[0], p[2])
@@ -135,21 +139,24 @@ class Mparser(Parser):
     @_("ID", "ID enum_list ")
     def lvalue(self, p):
         if len(p) == 1:
-            return AST.EnumList(p[0])
+            return AST.LValue(p[0])
         else:
-            return AST.EnumList(p[0], p[1])
+            return AST.RefValue(p[0], p[1])
 
-    @_('"[" enumerable "," enumerable "]"')
+    @_('"[" enum_sequence "]"')
     def enum_list(self, p):
-        return AST.EnumerableList(p[1], p[3])
+        return p[1]
+
+    @_("enumerable", 'enumerable "," enum_sequence')
+    def enum_sequence(self, p):
+        if len(p) == 1:
+            return AST.EnumerableList(p[0])
+        else:
+            return AST.EnumerableList(p[0], p[2])
 
     @_('ID "\'" ')
     def element(self, p):
         return AST.Transpose(p[0])
-
-    @_('"[" vector "]"')
-    def element(self, p):
-        return p[1]
 
     @_('"(" expr ")"')
     def expr(self, p):

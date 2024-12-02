@@ -96,16 +96,22 @@ class IntNum(Node):
         self.value = value
 
 
-class EnumList(Node):
+class LValue(Node):
     def __init__(self, identifier, enum_list=None):
         self.identifier = identifier
         self.enum_list = enum_list
 
 
+class RefValue(Node):
+    def __init__(self, identifier, ref):
+        self.identifier = identifier
+        self.ref = ref
+
+
 class EnumerableList(Node):
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
+    def __init__(self, enumerable, enum_list=None):
+        self.enumerable = enumerable
+        self.enum_list = enum_list
 
 
 class Transpose(Node):
