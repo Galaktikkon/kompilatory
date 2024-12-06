@@ -127,9 +127,9 @@ class TreePrinter:
 
     @addToClass(AST.ElementsList)
     def print_tree(self, indent=0):
-        self.enumerable.print_tree(indent)
         if self.enum_list:
             self.enum_list.print_tree(indent)
+        self.enumerable.print_tree(indent)
 
     @addToClass(AST.EnumerableList)
     def print_tree(self, indent=0):
