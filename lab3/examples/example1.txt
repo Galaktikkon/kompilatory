@@ -5,8 +5,8 @@ B = ones(7);   # create 7x7 matrix filled with ones
 I = eye(10);   # create 10x10 matrix filled with ones on diagonal and zeros elsewhere
 
 E1 = [ [1, 2, 3],
-       [4, 6],
-       [7, 8, 9, 5],
+       [2, 6],
+       ["A", 8, 9, 5],
        [1] ];
 
 

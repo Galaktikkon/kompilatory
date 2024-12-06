@@ -136,15 +136,26 @@ class Mparser(Parser):
     def enumerable(self, p):
         return p[0]
 
-    @_("ID", "ID vector ")
+    @_("ID", "ID ref_vector ")
     def lvalue(self, p):
         if len(p) == 1:
             return AST.LValue(p[0])
         else:
             return AST.RefValue(p[0], p[1])
 
-    @_('"[" enum_sequence "]"')
+    @_('"[" vector_elements "]"')
     def vector(self, p):
+        return p[1]
+
+    @_("element", 'element "," vector_elements')
+    def vector_elements(self, p):
+        if len(p) == 1:
+            return AST.ElementsList(p[0])
+        else:
+            return AST.ElementsList(p[2], p[0])
+
+    @_('"[" enum_sequence "]"')
+    def ref_vector(self, p):
         return p[1]
 
     @_("enumerable", 'enumerable "," enum_sequence')

@@ -15,8 +15,8 @@ FOR
 |  |  |  i
 |  |  |  M
 |  |  PRINT
-|  |  |  VECTOR
-|  |  |  |  i
+|  |  |  j
+|  |  |  i
 WHILE
 |  >
 |  |  k

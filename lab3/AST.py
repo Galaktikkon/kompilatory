@@ -113,6 +113,12 @@ class RefValue(Node):
         self.ref = ref
 
 
+class ElementsList(Node):
+    def __init__(self, enumerable, enum_list=None):
+        self.enumerable = enumerable
+        self.enum_list = enum_list
+
+
 class EnumerableList(Node):
     def __init__(self, enumerable, enum_list=None):
         self.enumerable = enumerable
