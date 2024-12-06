@@ -125,6 +125,12 @@ class TreePrinter:
         print_with_indent(indent + 1, str(self.identifier))
         self.ref.print_tree(indent + 1)
 
+    @addToClass(AST.ElementsList)
+    def print_tree(self, indent=0):
+        if self.enum_list:
+            self.enum_list.print_tree(indent)
+        self.enumerable.print_tree(indent)
+
     @addToClass(AST.EnumerableList)
     def print_tree(self, indent=0):
         self.enumerable.print_tree(indent)
