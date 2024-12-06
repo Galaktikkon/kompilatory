@@ -19,8 +19,10 @@ if __name__ == "__main__":
     parser = Mparser()
 
     ast = parser.parse(lexer.tokenize(text))
-    ast.print_tree()
-
+    try:
+        ast.print_tree()
+    except:
+        pass
     try:
         cwd = os.getcwd()
         path = os.path.join(cwd, "results")
@@ -36,8 +38,10 @@ if __name__ == "__main__":
 
             sys.stdout = f
 
-            ast.print_tree()
-
+            try:
+                ast.print_tree()
+            except:
+                pass
     except IOError:
         sys.exit(0)
     finally:

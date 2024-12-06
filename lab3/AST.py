@@ -104,25 +104,19 @@ class IntNum(Node):
 class LValue(Node):
     def __init__(self, identifier, enum_list=None):
         self.identifier = identifier
-        self.enum_list = enum_list
 
 
 class RefValue(Node):
-    def __init__(self, identifier, ref):
+    def __init__(self, identifier, row, col):
         self.identifier = identifier
-        self.ref = ref
+        self.row = row
+        self.col = col
 
 
 class ElementsList(Node):
-    def __init__(self, enumerable, enum_list=None):
-        self.enumerable = enumerable
-        self.enum_list = enum_list
-
-
-class EnumerableList(Node):
-    def __init__(self, enumerable, enum_list=None):
-        self.enumerable = enumerable
-        self.enum_list = enum_list
+    def __init__(self, element, element_list=None):
+        self.element = element
+        self.element_list = element_list
 
 
 class Transpose(Node):

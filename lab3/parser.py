@@ -13,7 +13,7 @@ class Mparser(Parser):
     debugfile = "parser.out"
 
     precedence = (
-        ("nonassoc", "=", ADD_ASSIGN, SUB_ASSIGN, MUL_ASSIGN, DIV_ASSIGN),
+        # ("nonassoc", "=", ADD_ASSIGN, SUB_ASSIGN, MUL_ASSIGN, DIV_ASSIGN),
         ("nonassoc", EQ, NEQ, LEQ, GEQ, ">", "<"),
         ("left", "+", "-", MAT_PLUS, MAT_MINUS),
         ("left", "*", "/", MAT_MUL, MAT_DIV),
@@ -56,8 +56,8 @@ class Mparser(Parser):
         return AST.Assignment(p[0], p[1], p[2])
 
     @_(
-        'IFX "(" condition ")" line ELSE line %prec IFX',
-        'IFX "(" condition ")" line %prec ELSE',
+        'IF "(" condition ")" line ELSE line %prec IFX',
+        'IF "(" condition ")" line %prec ELSE',
     )
     def line(self, p):
         if len(p) == 7:
@@ -136,12 +136,12 @@ class Mparser(Parser):
     def enumerable(self, p):
         return p[0]
 
-    @_("ID", "ID ref_vector ")
+    @_("ID", 'ID "[" enumerable "," enumerable "]"')
     def lvalue(self, p):
         if len(p) == 1:
             return AST.LValue(p[0])
         else:
-            return AST.RefValue(p[0], p[1])
+            return AST.RefValue(p[0], p[2], p[4])
 
     @_('"[" vector_elements "]"')
     def vector(self, p):
@@ -153,17 +153,6 @@ class Mparser(Parser):
             return AST.ElementsList(p[0])
         else:
             return AST.ElementsList(p[2], p[0])
-
-    @_('"[" enum_sequence "]"')
-    def ref_vector(self, p):
-        return p[1]
-
-    @_("enumerable", 'enumerable "," enum_sequence')
-    def enum_sequence(self, p):
-        if len(p) == 1:
-            return AST.EnumerableList(p[0])
-        else:
-            return AST.EnumerableList(p[0], p[2])
 
     @_('ID "\'" ')
     def element(self, p):

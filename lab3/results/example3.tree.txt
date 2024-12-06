@@ -15,8 +15,8 @@ FOR
 |  |  |  i
 |  |  |  M
 |  |  PRINT
-|  |  |  j
 |  |  |  i
+|  |  |  j
 WHILE
 |  >
 |  |  k

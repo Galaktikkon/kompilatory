@@ -116,26 +116,20 @@ class TreePrinter:
     @addToClass(AST.LValue)
     def print_tree(self, indent=0):
         print_with_indent(indent, str(self.identifier))
-        if self.enum_list:
-            self.enum_list.print_tree(indent)
 
     @addToClass(AST.RefValue)
     def print_tree(self, indent=0):
         print_with_indent(indent, "REF")
         print_with_indent(indent + 1, str(self.identifier))
-        self.ref.print_tree(indent + 1)
+        if self.col and self.row:
+            self.row.print_tree(indent + 1)
+            self.col.print_tree(indent + 1)
 
     @addToClass(AST.ElementsList)
     def print_tree(self, indent=0):
-        if self.enum_list:
-            self.enum_list.print_tree(indent)
-        self.enumerable.print_tree(indent)
-
-    @addToClass(AST.EnumerableList)
-    def print_tree(self, indent=0):
-        self.enumerable.print_tree(indent)
-        if self.enum_list:
-            self.enum_list.print_tree(indent)
+        if self.element_list:
+            self.element_list.print_tree(indent)
+        self.element.print_tree(indent)
 
     @addToClass(AST.Transpose)
     def print_tree(self, indent=0):
