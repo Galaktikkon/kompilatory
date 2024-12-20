@@ -276,13 +276,13 @@ class TypeChecker(NodeVisitor):
 
         if not identifier:
             self.error_list.append(
-                f"(RefValue): Type Error at line: {node.line_number}"
+                f"Line:{node.line_number}, {node.identifier.name} is not defined"
             )
             return
 
         if not (type(identifier) is Matrix or type(identifier) is Vector):
             self.error_list.append(
-                f"(RefValue): Type Error at line: {node.line_number}"
+                f"Line:{node.line_number}, {node.identifier.name} is expected to be type of Vector or Matrix"
             )
             return
 
@@ -290,7 +290,7 @@ class TypeChecker(NodeVisitor):
             n = identifier.size
             if not 0 <= int(node.row.value) < int(n):
                 self.error_list.append(
-                    f"(RefValue): Type Error at line: {node.line_number}"
+                    f"Line:{node.line_number}, index {node.row.value} out of bounds of {identifier}"
                 )
             else:
                 self.visit(node.row)
@@ -298,25 +298,25 @@ class TypeChecker(NodeVisitor):
         if type(identifier) is Vector and node.col:
 
             self.error_list.append(
-                f"(RefValue): Type Error at line: {node.line_number}"
+                f"Line:{node.line_number}, column index is out of bound for type Vector"
             )
 
         if type(identifier) is Matrix:
             n, m = identifier.shape
             print(identifier)
-            if (
-                type(node.row) is IntNum and not 0 <= int(node.row.value) <= int(n)
-            ) or (type(node.col) is IntNum and not 0 <= int(node.col.value) <= int(m)):
+            if type(node.col) is IntNum and not 0 <= int(node.col.value) <= int(m):
                 self.error_list.append(
-                    f"(RefValue): Type Error at line: {node.line_number}"
+                    f"Line:{node.line_number}, index {node.col.value} out of bounds of {identifier}"
                 )
+                return
+            if type(node.row) is IntNum and not 0 <= int(node.row.value) <= int(n):
+                self.error_list.append(
+                    f"Line:{node.line_number}, index {node.row.value} out of bounds of {identifier}"
+                )
+                return
             else:
                 self.visit(node.row)
                 self.visit(node.col)
-        else:
-            self.error_list.append(
-                f"(RefValue): Type Error at line: {node.line_number}"
-            )
         return identifier
 
     def visit_ElementsList(self, node):
