@@ -167,10 +167,19 @@ class TypeChecker(NodeVisitor):
         self.visit(node.expr)
 
     def visit_Break(self, node):
-        pass
+
+        scope = self.symbol_table.name
+
+        if not (scope == "for scope" or scope == "while scope"):
+            self.error_list.append(f"(Break): Type Error at line: {node.line_number}")
 
     def visit_Continue(self, node):
-        pass
+        scope = self.symbol_table.name
+
+        if not (scope == "for scope" or scope == "while scope"):
+            self.error_list.append(
+                f"(Continue): Type Error at line: {node.line_number}"
+            )
 
     def visit_Assignment(self, node):
         expr_type = self.visit(node.expr)
@@ -194,17 +203,20 @@ class TypeChecker(NodeVisitor):
 
     def visit_ForLoop(self, node):
         self.visit(node.variable)
-        for_scope: SymbolTable = self.symbol_table.pushScope("for scope")
+        self.symbol_table = self.symbol_table.pushScope("for scope")
         start_type = self.visit(node.start)
         end_type = self.visit(node.end)
         if start_type is Int and end_type is Int:
-            for_scope.put(node.variable.identifier, Int)
+            self.symbol_table.put(node.variable.identifier, Int)
         self.visit(node.body)
+        self.symbol_table = self.symbol_table.popScope()
 
     def visit_WhileLoop(self, node):
         cond_type = self.visit(node.condition)
+        self.symbol_table = self.symbol_table.pushScope("while scope")
         if cond_type is Bool:
             self.visit(node.body)
+        self.symbol_table = self.symbol_table.popScope()
 
     def visit_Vector(self, node):
         return self.visit(node.vector_elements)
@@ -260,21 +272,52 @@ class TypeChecker(NodeVisitor):
         return self.symbol_table.get(node.identifier)
 
     def visit_RefValue(self, node):
-        identifier_type = self.symbol_table.get(node.identifier)
-        if identifier_type is Vector:
-            self.visit(node.row)
-        if identifier_type is Vector and node.col:
+        identifier = self.symbol_table.get(node.identifier)
+
+        if not identifier:
             self.error_list.append(
                 f"(RefValue): Type Error at line: {node.line_number}"
             )
-        if identifier_type is Matrix:
-            self.visit(node.row)
-            self.visit(node.col)
+            return
+
+        if not (type(identifier) is Matrix or type(identifier) is Vector):
+            self.error_list.append(
+                f"(RefValue): Type Error at line: {node.line_number}"
+            )
+            return
+
+        if type(identifier) is Vector:
+            n = identifier.size
+            if not 0 <= int(node.row.value) < int(n):
+                self.error_list.append(
+                    f"(RefValue): Type Error at line: {node.line_number}"
+                )
+            else:
+                self.visit(node.row)
+
+        if type(identifier) is Vector and node.col:
+
+            self.error_list.append(
+                f"(RefValue): Type Error at line: {node.line_number}"
+            )
+
+        if type(identifier) is Matrix:
+            n, m = identifier.shape
+            print(identifier)
+            if (
+                type(node.row) is IntNum and not 0 <= int(node.row.value) <= int(n)
+            ) or (type(node.col) is IntNum and not 0 <= int(node.col.value) <= int(m)):
+                self.error_list.append(
+                    f"(RefValue): Type Error at line: {node.line_number}"
+                )
+            else:
+                self.visit(node.row)
+                self.visit(node.col)
         else:
             self.error_list.append(
                 f"(RefValue): Type Error at line: {node.line_number}"
             )
-        return identifier_type
+        return identifier
 
     def visit_ElementsList(self, node):
         elements_types = set()
