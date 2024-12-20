@@ -6,6 +6,10 @@ import AST
 # obliczenia robić poziomami (dodawanie liczbowe i dodawanie macierzowe w jednym priorytecie)
 
 
+def _(*right_side: str) -> any:
+    pass
+
+
 class Mparser(Parser):
 
     tokens = Scanner.tokens
@@ -13,14 +17,17 @@ class Mparser(Parser):
     debugfile = "parser.out"
 
     precedence = (
-        ("nonassoc", "=", ADD_ASSIGN, SUB_ASSIGN, MUL_ASSIGN, DIV_ASSIGN),
-        ("nonassoc", EQ, NEQ, LEQ, GEQ, ">", "<"),
-        ("left", "+", "-", MAT_PLUS, MAT_MINUS),
-        ("left", "*", "/", MAT_MUL, MAT_DIV),
-        ("right", UMINUS),
-        ("left", IFX),
-        ("right", ELSE),
+        ("nonassoc", "EQ", "NEQ", "LEQ", "GEQ", ">", "<"),
+        ("left", "+", "-", "MAT_PLUS", "MAT_MINUS"),
+        ("left", "*", "/", "MAT_MUL", "MAT_DIV"),
+        ("right", "UMINUS"),
+        ("left", "IFX"),
+        ("right", "ELSE"),
     )
+
+    @_("lines")
+    def program(self, p):
+        return AST.Program(p[0])
 
     @_("lines line", "line")
     def lines(self, p):
@@ -56,8 +63,8 @@ class Mparser(Parser):
         return AST.Assignment(p[0], p[1], p[2])
 
     @_(
-        'IFX "(" condition ")" line ELSE line %prec IFX',
-        'IFX "(" condition ")" line %prec ELSE',
+        'IF "(" condition ")" line ELSE line %prec IFX',
+        'IF "(" condition ")" line %prec ELSE',
     )
     def line(self, p):
         if len(p) == 7:
@@ -97,8 +104,9 @@ class Mparser(Parser):
     def expr(self, p):
         return AST.BinOp(p[1], p[0], p[2])
 
-    @_("vector", "matrix", "element")
+    @_("vectors", "matrix", "element")
     def expr(self, p):
+
         return p[0]
 
     @_("vector", 'vectors "," vector')
@@ -115,6 +123,18 @@ class Mparser(Parser):
     @_('ZEROS "(" enumerable ")"', 'EYE "(" enumerable ")"', 'ONES "(" enumerable ")"')
     def element(self, p):
         return AST.MatrixOp(p[0], p[2])
+
+    @_(
+        'ZEROS "(" enumerable "," enumerable ")"',
+        'EYE "(" enumerable "," enumerable ")"',
+        'ONES "(" enumerable "," enumerable ")"',
+    )
+    def element(self, p):
+        return AST.MatrixOp(
+            p[0],
+            p[2],
+            p[4],
+        )
 
     @_("enumerable")
     def element(self, p):
@@ -136,23 +156,28 @@ class Mparser(Parser):
     def enumerable(self, p):
         return p[0]
 
-    @_("ID", "ID vector ")
+    @_("ID")
     def lvalue(self, p):
-        if len(p) == 1:
-            return AST.LValue(p[0])
-        else:
-            return AST.RefValue(p[0], p[1])
+        return AST.LValue(p[0])
 
-    @_('"[" enum_sequence "]"')
+    @_('ID "[" enumerable "," enumerable "]"')
+    def lvalue(self, p):
+        return AST.RefValue(p[0], p[2], p[4])
+
+    @_('ID "[" enumerable "]"')
+    def lvalue(self, p):
+        return AST.RefValue(p[0], p[2])
+
+    @_('"[" vector_elements "]"')
     def vector(self, p):
         return p[1]
 
-    @_("enumerable", 'enumerable "," enum_sequence')
-    def enum_sequence(self, p):
+    @_("element", 'element "," vector_elements')
+    def vector_elements(self, p):
         if len(p) == 1:
-            return AST.EnumerableList(p[0])
+            return AST.ElementsList(p[0])
         else:
-            return AST.EnumerableList(p[0], p[2])
+            return AST.ElementsList(p[2], p[0])
 
     @_('ID "\'" ')
     def element(self, p):

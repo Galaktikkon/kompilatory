@@ -3,6 +3,7 @@ from parser import Mparser
 from scanner import Scanner
 from TreePrinter import TreePrinter
 from TypeChecker import TypeChecker
+from Interpreter import Interpreter
 
 if __name__ == "__main__":
 
@@ -22,3 +23,9 @@ if __name__ == "__main__":
     # Below code shows how to use visitor
     typeChecker = TypeChecker()
     typeChecker.visit(ast)  # or alternatively ast.accept(typeChecker)
+
+    ast.accept(Interpreter())
+    # in future
+    # ast.accept(OptimizationPass1())
+    # ast.accept(OptimizationPass2())
+    # ast.accept(CodeGenerator())

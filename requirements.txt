@@ -14,3 +14,4 @@ pre_commit==4.0.1
 PyYAML==6.0.2
 sly==0.5
 virtualenv==20.27.1
+numpy==24.3.1
