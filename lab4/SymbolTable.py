@@ -1,18 +1,3 @@
-class Symbol(object):
-    def __init__(self, name):
-        self.name = name
-
-    def __repr__(self):
-        return "Symbol: " + str(self.name)
-
-
-class VariableSymbol(Symbol):
-    def __init__(self, name, type):
-        pass
-
-    #
-
-
 class SymbolTable(object):
     def __init__(self, parent, name):  # parent scope and symbol table name
         self.parent = parent

@@ -1,9 +1,7 @@
 from sly import Parser
+from errors import ParserError
 from scanner import Scanner
 import AST
-
-# rekursja prawostronna
-# obliczenia robić poziomami (dodawanie liczbowe i dodawanie macierzowe w jednym priorytecie)
 
 
 def _(*right_side: str) -> any:
@@ -12,6 +10,8 @@ def _(*right_side: str) -> any:
 
 class Mparser(Parser):
 
+    error_list = []
+    error_messages = set()
     tokens = Scanner.tokens
 
     debugfile = "parser.out"
@@ -190,4 +190,17 @@ class Mparser(Parser):
 
     @_('"{" lines "}"')
     def line(self, p):
-        return p[1]
+        return AST.Block(p[1])
+
+    def error(self, token):
+        if token:
+            text = f"Syntax error at token '{token.type}' (value: '{token.value}')"
+            if text not in self.error_messages:
+                self.error_list.append(
+                    ParserError(
+                        text=text,
+                        line_number=token.lineno,
+                    )
+                )
+                self.error_messages.add(text)
+        self.errok()

@@ -1,122 +1,12 @@
 from AST import *
 from ast import AST
-from operations import *
+from expression_results import *
 from SymbolTable import SymbolTable
+from errors import SemanticError
 
-ttype = {}
-
-ttype["'", Matrix] = Matrix
-
-
-ttype["-", Int] = Int
-ttype["-", Float] = Float
-ttype["-", Vector] = Vector
-ttype["-", Matrix] = Matrix
-
-
-ttype["*", Int, Int] = Int
-ttype["*", Float, Float] = Float
-ttype["*", Int, Float] = Float
-ttype["*", Float, Int] = Float
-
-ttype["*", Int, Vector] = Vector
-ttype["*", Vector, Int] = Vector
-ttype["*", Float, Vector] = Vector
-ttype["*", Vector, Float] = Vector
-
-ttype["*", Int, Matrix] = Matrix
-ttype["*", Matrix, Int] = Matrix
-ttype["*", Float, Matrix] = Matrix
-ttype["*", Matrix, Float] = Matrix
-
-ttype["*", Matrix, Matrix] = Matrix
-
-ttype["*", Int, String] = String
-ttype["*", String, Int] = String
-
-
-ttype["/", Int, Int] = Float
-ttype["/", Float, Float] = Float
-ttype["/", Int, Float] = Float
-ttype["/", Float, Int] = Float
-
-ttype["/", Int, Vector] = Vector
-ttype["/", Vector, Int] = Vector
-ttype["/", Float, Vector] = Vector
-ttype["/", Vector, Float] = Vector
-
-ttype["/", Int, Matrix] = Matrix
-ttype["/", Matrix, Int] = Matrix
-ttype["/", Float, Matrix] = Matrix
-ttype["/", Matrix, Float] = Matrix
-
-
-ttype[".*", Vector, Vector] = Vector
-ttype[".*", Matrix, Matrix] = Matrix
-
-ttype["./", Vector, Vector] = Vector
-ttype["./", Matrix, Matrix] = Matrix
-
-
-ttype["+", Int, Int] = Int
-ttype["+", Float, Float] = Float
-ttype["+", Int, Float] = Float
-ttype["+", Float, Int] = Float
-ttype["+", String, String] = String
-
-
-ttype["-", Int, Int] = Int
-ttype["-", Float, Float] = Float
-ttype["-", Int, Float] = Float
-ttype["-", Float, Int] = Float
-
-
-ttype[".+", Vector, Vector] = Vector
-ttype[".+", Matrix, Matrix] = Matrix
-
-ttype[".-", Vector, Vector] = Vector
-ttype[".-", Matrix, Matrix] = Matrix
-
-
-ttype["==", Vector, Vector] = Bool
-ttype["==", Matrix, Matrix] = Bool
-ttype["==", Int, Int] = Bool
-ttype["==", Float, Float] = Bool
-ttype["==", Int, Float] = Bool
-ttype["==", Float, Int] = Bool
-ttype["==", String, String] = Bool
-
-ttype["!=", Vector, Vector] = Bool
-ttype["!=", Matrix, Matrix] = Bool
-ttype["!=", Int, Int] = Bool
-ttype["!=", Float, Float] = Bool
-ttype["!=", Int, Float] = Bool
-ttype["!=", Float, Int] = Bool
-ttype["!=", String, String] = Bool
-
-ttype["<", Int, Int] = Bool
-ttype["<", Float, Float] = Bool
-ttype["<", Int, Float] = Bool
-ttype["<", Float, Int] = Bool
-ttype["<", String, String] = Bool
-
-ttype[">", Int, Int] = Bool
-ttype[">", Float, Float] = Bool
-ttype[">", Int, Float] = Bool
-ttype[">", Float, Int] = Bool
-ttype[">", String, String] = Bool
-
-ttype["<=", Int, Int] = Bool
-ttype["<=", Float, Float] = Bool
-ttype["<=", Int, Float] = Bool
-ttype["<=", Float, Int] = Bool
-ttype["<=", String, String] = Bool
-
-ttype[">=", Int, Int] = Bool
-ttype[">=", Float, Float] = Bool
-ttype[">=", Int, Float] = Bool
-ttype[">=", Float, Int] = Bool
-ttype[">=", String, String] = Bool
+WHILE_SCOPE = "while_scope"
+FOR_SCOPE = "for_scope"
+BLOCK_SCOPE = "block_scope"
 
 
 class NodeVisitor(object):
@@ -125,25 +15,8 @@ class NodeVisitor(object):
         visitor = getattr(self, method, self.generic_visit)
         return visitor(node)
 
-    def generic_visit(
-        self, node
-    ):  # Called if no explicit visitor function exists for a node.
-        if isinstance(node, list):
-            for elem in node:
-                self.visit(elem)
-        else:
-            for child in node.children:
-                if isinstance(child, list):
-                    for item in child:
-                        if isinstance(item, AST.Node):
-                            self.visit(item)
-                elif isinstance(child, AST.Node):
-                    self.visit(child)
-
-    # simpler version of generic_visit, not so general
-    # def generic_visit(self, node):
-    #    for child in node.children:
-    #        self.visit(child)
+    def generic_visit(self, node):
+        print("Gen visit: " + node + ": " + str(node))
 
 
 class TypeChecker(NodeVisitor):
@@ -169,16 +42,22 @@ class TypeChecker(NodeVisitor):
     def visit_Break(self, node):
 
         scope = self.symbol_table.name
-
-        if not (scope == "for scope" or scope == "while scope"):
-            self.error_list.append(f"(Break): Type Error at line: {node.line_number}")
+        if not (scope == FOR_SCOPE or scope == WHILE_SCOPE):
+            self.error_list.append(
+                SemanticError(
+                    text=f"'break' statement used out of loop statement",
+                    line_number=node.line_number,
+                )
+            )
 
     def visit_Continue(self, node):
         scope = self.symbol_table.name
-
-        if not (scope == "for scope" or scope == "while scope"):
+        if not (scope == FOR_SCOPE or scope == WHILE_SCOPE):
             self.error_list.append(
-                f"(Continue): Type Error at line: {node.line_number}"
+                SemanticError(
+                    text=f"'continue' statement used out of loop statement",
+                    line_number=node.line_number,
+                )
             )
 
     def visit_Assignment(self, node):
@@ -189,31 +68,44 @@ class TypeChecker(NodeVisitor):
         cond_type = self.visit(node.condition)
         if cond_type is Bool:
             self.visit(node.if_branch)
-            self.visit(node.else_branch)
+            if node.else_branch:
+                self.visit(node.else_branch)
         else:
-            self.error_list.append(f"(IfElse): Type Error at line: {node.line_number}")
+            self.error_list.append(
+                SemanticError(
+                    text=f"{node.condition} is cannot be interpreted as 'Bool' type",
+                    line_number=node.line_number,
+                )
+            )
 
     def visit_BinOp(self, node):
         type_left = self.visit(node.left)
         type_right = self.visit(node.right)
-        if not (node.op, type_left, type_right) in ttype:
-            self.error_list.append(f"(BinOp): Type Error at line: {node.line_number}")
+
+        result = result_type(node.op, type_left, type_right)
+
+        if not result:
+            self.error_list.append(
+                SemanticError(
+                    text=f"'{node.op}' is not supported between instances of '{type_left}' and '{type_right}'",
+                    line_number=node.line_number,
+                )
+            )
         else:
-            return ttype[node.op, type_left, type_right]
+            return result_type(node.op, type_left, type_right)
 
     def visit_ForLoop(self, node):
-        self.visit(node.variable)
-        self.symbol_table = self.symbol_table.pushScope("for scope")
+        self.symbol_table = self.symbol_table.pushScope(FOR_SCOPE)
         start_type = self.visit(node.start)
         end_type = self.visit(node.end)
         if start_type is Int and end_type is Int:
-            self.symbol_table.put(node.variable.identifier, Int)
+            self.symbol_table.put(node.variable, Int)
         self.visit(node.body)
         self.symbol_table = self.symbol_table.popScope()
 
     def visit_WhileLoop(self, node):
         cond_type = self.visit(node.condition)
-        self.symbol_table = self.symbol_table.pushScope("while scope")
+        self.symbol_table = self.symbol_table.pushScope(WHILE_SCOPE)
         if cond_type is Bool:
             self.visit(node.body)
         self.symbol_table = self.symbol_table.popScope()
@@ -240,24 +132,69 @@ class TypeChecker(NodeVisitor):
             vector_types.add(vector.inner_type)
             vector_sizes.add(vector.size)
             rows += 1
-        if len(vector_types) == 1 and len(vector_sizes) == 1:
-            print(vector_types, vector_sizes, rows)
-            return Matrix(
-                inner_type=vector_types.pop(), shape=(rows, vector_sizes.pop())
+
+        if not len(vector_types) == 1:
+            self.error_list.append(
+                SemanticError(
+                    text=f"Matrix vector elements are not of the same type",
+                    line_number=node.line_number,
+                )
             )
-        else:
-            self.error_list.append(f"(Matrix): Type Error at line: {node.line_number}")
+            return
+
+        if not len(vector_sizes) == 1:
+            self.error_list.append(
+                SemanticError(
+                    text=f"Matrix vectors are not of the same size",
+                    line_number=node.line_number,
+                )
+            )
+            return
+        return Matrix(inner_type=vector_types.pop(), shape=(rows, vector_sizes.pop()))
 
     def visit_MatrixOp(self, node):
         enumerable1 = self.visit(node.enumerable1)
+        value1 = (
+            node.enumerable1.value
+            if type(node.enumerable1) is IntNum
+            else node.enumerable1.identifier
+        )
         if node.enumerable2:
             enumerable2 = self.visit(node.enumerable2)
-            if enumerable1 is Int and enumerable2 is Int:
-                return Matrix(Int, (None, None))
-        if enumerable1 is Int:
-            return Matrix(Int, (None, None))
+            if not enumerable1 is Int:
+                self.error_list.append(
+                    SemanticError(
+                        text=f"First dimension is not type of {Int}",
+                        line_number=node.line_number,
+                    )
+                )
+                return
+            if not enumerable2 is Int:
+                self.error_list.append(
+                    SemanticError(
+                        text=f"Second dimension is not type of {Int}",
+                        line_number=node.line_number,
+                    )
+                )
+                return
+            else:
+                value2 = (
+                    node.enumerable2.value
+                    if type(node.enumerable2) is IntNum
+                    else node.enumerable2.identifier
+                )
+                return Matrix(Int, (value1, value2))
 
-        self.error_list.append(f"(MatrixOp): Type Error at line: {node.line_number}")
+        if not enumerable1 is Int:
+            self.error_list.append(
+                SemanticError(
+                    text=f"First dimension is not type of {Int}",
+                    line_number=node.line_number,
+                )
+            )
+            return
+        else:
+            return Matrix(Int, (value1, value1))
 
     def visit_String(self, node):
         return String
@@ -276,21 +213,29 @@ class TypeChecker(NodeVisitor):
 
         if not identifier:
             self.error_list.append(
-                f"Line:{node.line_number}, {node.identifier.name} is not defined"
+                SemanticError(
+                    text=f"'{node.identifier}' is not defined",
+                    line_number=node.line_number,
+                )
             )
             return
 
         if not (type(identifier) is Matrix or type(identifier) is Vector):
             self.error_list.append(
-                f"Line:{node.line_number}, {node.identifier.name} is expected to be type of Vector or Matrix"
+                SemanticError(
+                    text=f"'{node.identifier}' is expected to be type of Vector or Matrix",
+                    line_number=node.line_number,
+                )
             )
             return
-
         if type(identifier) is Vector:
             n = identifier.size
             if not 0 <= int(node.row.value) < int(n):
                 self.error_list.append(
-                    f"Line:{node.line_number}, index {node.row.value} out of bounds of {identifier}"
+                    SemanticError(
+                        text=f"index {node.row.value} out of bounds of {identifier}",
+                        line_number=node.line_number,
+                    )
                 )
             else:
                 self.visit(node.row)
@@ -298,25 +243,37 @@ class TypeChecker(NodeVisitor):
         if type(identifier) is Vector and node.col:
 
             self.error_list.append(
-                f"Line:{node.line_number}, column index is out of bound for type Vector"
+                SemanticError(
+                    text=f"column index is out of bounds for type Vector",
+                    line_number=node.line_number,
+                )
             )
 
         if type(identifier) is Matrix:
             n, m = identifier.shape
-            print(identifier)
-            if type(node.col) is IntNum and not 0 <= int(node.col.value) <= int(m):
-                self.error_list.append(
-                    f"Line:{node.line_number}, index {node.col.value} out of bounds of {identifier}"
-                )
-                return
-            if type(node.row) is IntNum and not 0 <= int(node.row.value) <= int(n):
-                self.error_list.append(
-                    f"Line:{node.line_number}, index {node.row.value} out of bounds of {identifier}"
-                )
-                return
+            if n == None and m == None:
+                pass
             else:
-                self.visit(node.row)
-                self.visit(node.col)
+                if type(node.col) is IntNum and not 0 <= int(node.col.value) < int(m):
+                    self.error_list.append(
+                        SemanticError(
+                            text=f"index {node.col.value} out of bounds of {identifier}",
+                            line_number=node.line_number,
+                        )
+                    )
+                    return
+                if type(node.row) is IntNum and not 0 <= int(node.row.value) < int(n):
+                    self.error_list.append(
+                        SemanticError(
+                            text=f"index {node.row.value} out of bounds of {identifier}",
+                            line_number=node.line_number,
+                        )
+                    )
+                    return
+                else:
+                    self.visit(node.row)
+                    self.visit(node.col)
+
         return identifier
 
     def visit_ElementsList(self, node):
@@ -330,15 +287,30 @@ class TypeChecker(NodeVisitor):
         if len(elements_types) == 1:
             return Vector(elements_types.pop(), count)
         else:
+
             self.error_list.append(
-                f"(ElementsList): Type Error at line: {node.line_number}"
+                SemanticError(
+                    text=f"Vector elements are not of the same type",
+                    line_number=node.line_number,
+                )
             )
             return Vector(None, None)
 
     def visit_Transpose(self, node):
-        operand_type = self.visit(node.identifier)
-        return ttype["'", operand_type]
+        operand = self.symbol_table.get(node.identifier)
+        return result_type("'", operand)
 
     def visit_UnaryOp(self, node):
         operand_type = self.visit(node.operand)
-        return ttype[node.operator, operand_type]
+        return result_type(node.operator, operand_type)
+
+    def visit_Block(self, node):
+
+        scope_name = self.symbol_table.name
+
+        if scope_name == WHILE_SCOPE or scope_name == FOR_SCOPE:
+            self.visit(node.lines)
+        else:
+            self.symbol_table = self.symbol_table.pushScope(BLOCK_SCOPE)
+            self.visit(node.lines)
+            self.symbol_table = self.symbol_table.popScope()

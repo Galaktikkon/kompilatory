@@ -157,3 +157,8 @@ class UnaryOp(Node):
         self.operator = op
         self.operand = operand
         self.line_number = line_number
+
+
+class Block(Node):
+    def __init__(self, lines):
+        self.lines = lines

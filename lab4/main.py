@@ -13,27 +13,31 @@ if __name__ == "__main__":
         print("Cannot open {0} file".format(filename))
         sys.exit(0)
 
-    scanner = Scanner()
-    parser = Mparser()
-
-    text = file.read()
+    scanner: Scanner = Scanner()
+    text: str = file.read()
 
     tokens = scanner.tokenize(text)
 
-    try:
-        ast = parser.parse(tokens)
-    except:
-        print("Parser error")
+    if scanner.error_list:
+        for error in scanner.error_list:
+            print(error)
+        raise Exception("Scanner: Found illegal characters")
 
-    # try:
-    #     ast.print_tree()
-    # except:
-    #     print("AST error")
+    parser = Mparser()
 
-    # Below code shows how to use visitor
+    ast = parser.parse(tokens)
+    if parser.error_list:
+        for error in parser.error_list:
+            print(error)
+        raise Exception("Parser: Parsing error")
+
+    # ast.print_tree()
 
     typeChecker = TypeChecker()
-    typeChecker.visit(ast)  # or alternatively ast.accept(typeChecker)
-    print(typeChecker.symbol_table)
-    for error in typeChecker.error_list:
-        print(error)
+
+    typeChecker.visit(ast)
+    if typeChecker.error_list:
+        # print(typeChecker.symbol_table)
+        for error in typeChecker.error_list:
+            print(error)
+        raise Exception("TypeChecker: Type error")
