@@ -21,7 +21,7 @@ class Scanner(Lexer):
         FLOAT,
         INT,
         STR,
-        IFX,
+        IF,
         ELSE,
         FOR,
         WHILE,
@@ -70,7 +70,7 @@ class Scanner(Lexer):
     ID = r"[a-zA-Z_][a-zA-Z0-9_]*"
 
     # Special cases
-    ID["if"] = IFX
+    ID["if"] = IF
     ID["else"] = ELSE
     ID["for"] = FOR
     ID["while"] = WHILE

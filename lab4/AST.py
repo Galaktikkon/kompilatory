@@ -3,6 +3,11 @@ class Node(object):
         raise NotImplementedError("printTree not implemented for this class")
 
 
+class Program(Node):
+    def __init__(self, lines):
+        self.lines = lines
+
+
 class Lines(Node):
     def __init__(self, line, lines=None):
         self.lines = lines
@@ -81,9 +86,10 @@ class Matrix(Node):
 
 
 class MatrixOp(Node):
-    def __init__(self, type, enumerable):
+    def __init__(self, type, enumerable1, enumerable2=None):
         self.type = type
-        self.enumerable = enumerable
+        self.enumerable1 = enumerable1
+        self.enumerable2 = enumerable2
 
 
 class String(Node):
@@ -104,19 +110,19 @@ class IntNum(Node):
 class LValue(Node):
     def __init__(self, identifier, enum_list=None):
         self.identifier = identifier
-        self.enum_list = enum_list
 
 
 class RefValue(Node):
-    def __init__(self, identifier, ref):
+    def __init__(self, identifier, row, col=None):
         self.identifier = identifier
-        self.ref = ref
+        self.row = row
+        self.col = col
 
 
-class EnumerableList(Node):
-    def __init__(self, enumerable, enum_list=None):
-        self.enumerable = enumerable
-        self.enum_list = enum_list
+class ElementsList(Node):
+    def __init__(self, element, element_list=None):
+        self.element = element
+        self.element_list = element_list
 
 
 class Transpose(Node):

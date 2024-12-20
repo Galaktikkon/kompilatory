@@ -2,6 +2,93 @@
 
 import AST
 from collections import defaultdict
+from SymbolTable import SymbolTable
+
+
+ttype = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: None)))
+
+ttype["+"]["int"]["int"] = "int"
+ttype["-"]["int"]["int"] = "int"
+ttype["*"]["int"]["int"] = "int"
+ttype["/"]["int"]["int"] = "int"
+ttype["<"]["int"]["int"] = "logic"
+ttype[">"]["int"]["int"] = "logic"
+ttype["<="]["int"]["int"] = "logic"
+ttype[">="]["int"]["int"] = "logic"
+ttype["=="]["int"]["int"] = "logic"
+ttype["!="]["int"]["int"] = "logic"
+
+ttype["+"]["int"]["float"] = "float"
+ttype["-"]["int"]["float"] = "float"
+ttype["*"]["int"]["float"] = "float"
+ttype["/"]["int"]["float"] = "float"
+ttype["<"]["int"]["float"] = "logic"
+ttype[">"]["int"]["float"] = "logic"
+ttype["<="]["int"]["float"] = "logic"
+ttype[">="]["int"]["float"] = "logic"
+ttype["=="]["int"]["float"] = "logic"
+ttype["!="]["int"]["float"] = "logic"
+
+ttype["+"]["float"]["int"] = "float"
+ttype["-"]["float"]["int"] = "float"
+ttype["*"]["float"]["int"] = "float"
+ttype["/"]["float"]["int"] = "float"
+ttype["<"]["float"]["int"] = "logic"
+ttype[">"]["float"]["int"] = "logic"
+ttype["<="]["float"]["int"] = "logic"
+ttype[">="]["float"]["int"] = "logic"
+ttype["=="]["float"]["int"] = "logic"
+ttype["!="]["float"]["int"] = "logic"
+
+ttype["+"]["float"]["float"] = "float"
+ttype["-"]["float"]["float"] = "float"
+ttype["*"]["float"]["float"] = "float"
+ttype["/"]["float"]["float"] = "float"
+ttype["<"]["float"]["float"] = "logic"
+ttype[">"]["float"]["float"] = "logic"
+ttype["<="]["float"]["float"] = "logic"
+ttype[">="]["float"]["float"] = "logic"
+ttype["=="]["float"]["float"] = "logic"
+ttype["!="]["float"]["float"] = "logic"
+
+ttype["+"]["vector"]["vector"] = "vector"
+ttype["-"]["vector"]["vector"] = "vector"
+ttype["*"]["vector"]["vector"] = "vector"
+ttype["/"]["vector"]["vector"] = "vector"
+ttype["+="]["vector"]["vector"] = "vector"
+ttype["-="]["vector"]["vector"] = "vector"
+ttype["*="]["vector"]["vector"] = "vector"
+ttype["/="]["vector"]["vector"] = "vector"
+
+ttype[".+"]["vector"]["vector"] = "vector"
+ttype[".+"]["vector"]["int"] = "vector"
+ttype[".+"]["vector"]["float"] = "vector"
+ttype[".+"]["int"]["vector"] = "vector"
+ttype[".+"]["float"]["vector"] = "vector"
+
+ttype[".-"]["vector"]["vector"] = "vector"
+ttype[".-"]["vector"]["int"] = "vector"
+ttype[".-"]["vector"]["float"] = "vector"
+ttype[".-"]["int"]["vector"] = "vector"
+ttype[".-"]["float"]["vector"] = "vector"
+
+ttype[".*"]["vector"]["vector"] = "vector"
+ttype[".*"]["vector"]["int"] = "vector"
+ttype[".*"]["vector"]["float"] = "vector"
+ttype[".*"]["int"]["vector"] = "vector"
+ttype[".*"]["float"]["vector"] = "vector"
+
+ttype["./"]["vector"]["vector"] = "vector"
+ttype["./"]["vector"]["int"] = "vector"
+ttype["./"]["vector"]["float"] = "vector"
+ttype["./"]["int"]["vector"] = "vector"
+ttype["./"]["float"]["vector"] = "vector"
+
+ttype["'"]["vector"][None] = "vector"
+ttype["-"]["vector"][None] = "vector"
+ttype["-"]["int"][None] = "int"
+ttype["-"]["float"][None] = "float"
+ttype["+"]["string"]["string"] = "string"
 
 
 class NodeVisitor(object):
@@ -10,9 +97,7 @@ class NodeVisitor(object):
         visitor = getattr(self, method, self.generic_visit)
         return visitor(node)
 
-    def generic_visit(
-        self, node
-    ):  # Called if no explicit visitor function exists for a node.
+    def generic_visit(self, node):
         if isinstance(node, list):
             for elem in node:
                 self.visit(elem)
@@ -25,21 +110,8 @@ class NodeVisitor(object):
                 elif isinstance(child, AST.Node):
                     self.visit(child)
 
-    # simpler version of generic_visit, not so general
-    # def generic_visit(self, node):
-    #    for child in node.children:
-    #        self.visit(child)
-
 
 class TypeChecker(NodeVisitor):
-    def visit_BinExpr(self, node):
-        # alternative usage,
-        # requires definition of accept method in class Node
-        type1 = self.visit(node.left)  # type1 = node.left.accept(self)
-        type2 = self.visit(node.right)  # type2 = node.right.accept(self)
-        op = node.op
-        # ...
-        #
-
-    def visit_Variable(self, node):
-        pass
+    def __init__(self):
+        self.table = SymbolTable(None, "Program")
+        self.loop_iterator = 0
