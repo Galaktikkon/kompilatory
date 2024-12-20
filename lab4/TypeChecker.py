@@ -125,34 +125,6 @@ class NodeVisitor(object):
         visitor = getattr(self, method, self.generic_visit)
         return visitor(node)
 
-<<<<<<< HEAD
-    def generic_visit(self, node):
-        print("Gen visit: " + node.__class__.__name__ + ": " + str(node))
-        #if isinstance(node, list):
-        #    for elem in node:
-        #        self.visit(elem)
-        #else:
-        #    for child in node.children:
-        #        if isinstance(child, list):
-        #            for item in child:
-        #                if isinstance(item, AST.Node):
-        #                    self.visit(item)
-        #        elif isinstance(child, AST.Node):
-        #            self.visit(child)
-||||||| d9d2990
-    def generic_visit(self, node):
-        if isinstance(node, list):
-            for elem in node:
-                self.visit(elem)
-        else:
-            for child in node.children:
-                if isinstance(child, list):
-                    for item in child:
-                        if isinstance(item, AST.Node):
-                            self.visit(item)
-                elif isinstance(child, AST.Node):
-                    self.visit(child)
-=======
     def generic_visit(
         self, node
     ):  # Called if no explicit visitor function exists for a node.
@@ -167,7 +139,6 @@ class NodeVisitor(object):
                             self.visit(item)
                 elif isinstance(child, AST.Node):
                     self.visit(child)
->>>>>>> 59035f9a567bdeece64edd42c87b4c9ab47119f9
 
     # simpler version of generic_visit, not so general
     # def generic_visit(self, node):
@@ -177,72 +148,6 @@ class NodeVisitor(object):
 
 class TypeChecker(NodeVisitor):
     def __init__(self):
-<<<<<<< HEAD
-        self.table = SymbolTable(None, "Program")
-        self.loop_iterator = 0
-
-    def visitProgram(self, node):
-        self.visit(node.lines)
-
-    def visitLines(self, node):
-        self.visit(node.line)
-
-    def visitPrint(self, node):
-        if node.expr is not None: self.visit(node.expr)
-
-    def visitReturn(self, node):
-        if node.expr is not None: self.visit(node.expr)
-
-    def visitBreak(self, node):
-        if not self.loop_iterator > 0:
-            print("Line {}: BREAK outside loop function".format(node.line))
-
-    def visitReturn(self, node):
-        pass
-
-    def visitReturn(self, node):
-        pass
-
-    def visitReturn(self, node):
-        pass
-
-    def visitReturn(self, node):
-        pass
-
-    def visitReturn(self, node):
-        pass
-
-    def visitReturn(self, node):
-        pass
-
-    def visitReturn(self, node):
-        pass
-
-    def visitReturn(self, node):
-        pass
-
-    def visitReturn(self, node):
-        pass
-
-    def visitReturn(self, node):
-        pass
-
-    def visitReturn(self, node):
-        pass
-
-    def visitReturn(self, node):
-        pass
-
-    def visitReturn(self, node):
-        pass
-
-    def visitReturn(self, node):
-        pass
-
-||||||| d9d2990
-        self.table = SymbolTable(None, "Program")
-        self.loop_iterator = 0
-=======
         self.symbol_table = SymbolTable(None, "Program")
         self.error_list = []
 
@@ -394,4 +299,3 @@ class TypeChecker(NodeVisitor):
     def visit_UnaryOp(self, node):
         operand_type = self.visit(node.operand)
         return ttype[node.operator, operand_type]
->>>>>>> 59035f9a567bdeece64edd42c87b4c9ab47119f9
