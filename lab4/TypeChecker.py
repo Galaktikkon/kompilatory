@@ -98,20 +98,80 @@ class NodeVisitor(object):
         return visitor(node)
 
     def generic_visit(self, node):
-        if isinstance(node, list):
-            for elem in node:
-                self.visit(elem)
-        else:
-            for child in node.children:
-                if isinstance(child, list):
-                    for item in child:
-                        if isinstance(item, AST.Node):
-                            self.visit(item)
-                elif isinstance(child, AST.Node):
-                    self.visit(child)
+        print("Gen visit: " + node.__class__.__name__ + ": " + str(node))
+        #if isinstance(node, list):
+        #    for elem in node:
+        #        self.visit(elem)
+        #else:
+        #    for child in node.children:
+        #        if isinstance(child, list):
+        #            for item in child:
+        #                if isinstance(item, AST.Node):
+        #                    self.visit(item)
+        #        elif isinstance(child, AST.Node):
+        #            self.visit(child)
 
 
 class TypeChecker(NodeVisitor):
     def __init__(self):
         self.table = SymbolTable(None, "Program")
         self.loop_iterator = 0
+
+    def visitProgram(self, node):
+        self.visit(node.lines)
+
+    def visitLines(self, node):
+        self.visit(node.line)
+
+    def visitPrint(self, node):
+        if node.expr is not None: self.visit(node.expr)
+
+    def visitReturn(self, node):
+        if node.expr is not None: self.visit(node.expr)
+
+    def visitBreak(self, node):
+        if not self.loop_iterator > 0:
+            print("Line {}: BREAK outside loop function".format(node.line))
+
+    def visitReturn(self, node):
+        pass
+
+    def visitReturn(self, node):
+        pass
+
+    def visitReturn(self, node):
+        pass
+
+    def visitReturn(self, node):
+        pass
+
+    def visitReturn(self, node):
+        pass
+
+    def visitReturn(self, node):
+        pass
+
+    def visitReturn(self, node):
+        pass
+
+    def visitReturn(self, node):
+        pass
+
+    def visitReturn(self, node):
+        pass
+
+    def visitReturn(self, node):
+        pass
+
+    def visitReturn(self, node):
+        pass
+
+    def visitReturn(self, node):
+        pass
+
+    def visitReturn(self, node):
+        pass
+
+    def visitReturn(self, node):
+        pass
+
