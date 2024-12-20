@@ -20,9 +20,15 @@ if __name__ == "__main__":
 
     tokens = scanner.tokenize(text)
 
-    ast = parser.parse(tokens)
+    try:
+        ast = parser.parse(tokens)
+    except:
+        print("Parser error")
 
-    ast.print_tree()
+    # try:
+    #     ast.print_tree()
+    # except:
+    #     print("AST error")
 
     # Below code shows how to use visitor
 

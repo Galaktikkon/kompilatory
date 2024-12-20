@@ -27,7 +27,12 @@ class SymbolTable(object):
     #
 
     def get(self, name):  # get variable symbol or fundef from <name> entry
-        return self.table.get(name, None)
+        return self.table.get(name, self.__get_from_parent(name))
+
+    def __get_from_parent(self, name):
+        parent_scope = self.getParentScope()
+        if parent_scope:
+            return parent_scope.get(name)
 
     #
 
