@@ -1,6 +1,8 @@
 class Node(object):
     def print_tree(self, level=0):
         raise NotImplementedError("printTree not implemented for this class")
+    def accept(self, visitor):
+        return visitor.visit(self)
 
 
 class Program(Node):
@@ -157,3 +159,8 @@ class UnaryOp(Node):
         self.operator = op
         self.operand = operand
         self.line_number = line_number
+
+
+class Block(Node):
+    def __init__(self, lines):
+        self.lines = lines

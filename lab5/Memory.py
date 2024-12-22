@@ -20,9 +20,10 @@ class MemoryStack:
 
     def get(self, name):             # gets from memory stack current value of variable <name>
         for element in reversed(self.stack):
-            value = element.get(name)
-            if value is not None:
-                return value
+            if element is not None:
+                value = element.get(name)
+                if value is not None:
+                    return value
         return None
 
     def insert(self, name, value): # inserts into memory stack variable <name> with value <value>

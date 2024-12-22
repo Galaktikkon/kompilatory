@@ -18,6 +18,11 @@ class TreePrinter:
     def print_tree(self, indent=0):
         raise NotImplementedError("printTree not implemented for this class")
 
+    @addToClass(AST.Program)
+    def print_tree(self, indent=0):
+        if self.lines:
+            self.lines.print_tree(indent)
+
     @addToClass(AST.Lines)
     def print_tree(self, indent=0):
         if self.lines:
@@ -81,8 +86,9 @@ class TreePrinter:
 
     @addToClass(AST.Vector)
     def print_tree(self, indent=0):
+
         print_with_indent(indent, "VECTOR")
-        self.vector.print_tree(indent + 1)
+        self.vector_elements.print_tree(indent + 1)
 
     @addToClass(AST.VectorList)
     def print_tree(self, indent=0):
@@ -99,7 +105,9 @@ class TreePrinter:
     @addToClass(AST.MatrixOp)
     def print_tree(self, indent=0):
         print_with_indent(indent, str(self.type))
-        self.enumerable.print_tree(indent + 1)
+        self.enumerable1.print_tree(indent + 1)
+        if self.enumerable2:
+            self.enumerable2.print_tree(indent + 1)
 
     @addToClass(AST.String)
     def print_tree(self, indent=0):
@@ -116,20 +124,20 @@ class TreePrinter:
     @addToClass(AST.LValue)
     def print_tree(self, indent=0):
         print_with_indent(indent, str(self.identifier))
-        if self.enum_list:
-            self.enum_list.print_tree(indent)
 
     @addToClass(AST.RefValue)
     def print_tree(self, indent=0):
         print_with_indent(indent, "REF")
         print_with_indent(indent + 1, str(self.identifier))
-        self.ref.print_tree(indent + 1)
+        if self.col and self.row:
+            self.row.print_tree(indent + 1)
+            self.col.print_tree(indent + 1)
 
-    @addToClass(AST.EnumerableList)
+    @addToClass(AST.ElementsList)
     def print_tree(self, indent=0):
-        self.enumerable.print_tree(indent)
-        if self.enum_list:
-            self.enum_list.print_tree(indent)
+        if self.element_list:
+            self.element_list.print_tree(indent)
+        self.element.print_tree(indent)
 
     @addToClass(AST.Transpose)
     def print_tree(self, indent=0):

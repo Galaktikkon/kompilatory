@@ -4,6 +4,8 @@ from sly import Lexer
 
 class Scanner(Lexer):
 
+    error_list = []
+
     tokens = {
         ID,
         MAT_PLUS,
@@ -21,7 +23,7 @@ class Scanner(Lexer):
         FLOAT,
         INT,
         STR,
-        IFX,
+        IF,
         ELSE,
         FOR,
         WHILE,
@@ -70,7 +72,7 @@ class Scanner(Lexer):
     ID = r"[a-zA-Z_][a-zA-Z0-9_]*"
 
     # Special cases
-    ID["if"] = IFX
+    ID["if"] = IF
     ID["else"] = ELSE
     ID["for"] = FOR
     ID["while"] = WHILE
@@ -101,17 +103,18 @@ class Scanner(Lexer):
     NEQ = r"!="
 
     # Strings
-    STR = r"\".*?\""
+    STR = r"\"([^\"\\\n\r]|\\.)*\""
 
     # Floats
-    FLOAT = r"((\.\d+)|(\d+\.\d*))([eE][+-]?\d+)?|\d+([eE][+-]?\d+)"
+    FLOAT = r"(\d+\.\d*|\d*\.\d+|0\.)((E|e)(-|\+)?([1-9]\d*|0))?"
 
     # Integers
-    INT = r"\d+"
+    INT = r"0|[1-9]\d*"
 
     # Error handling rule for illegal characters
     def error(self, t):
-        print(f"({self.lineno}): !!! Illegal character: '{t.value[0]}' !!!")
+        Scanner.error_list.append(f"({self.lineno}): Illegal character: '{t.value[0]}'")
+        print(f"({self.lineno}): Illegal character: '{t.value[0]}'")
         self.index += 1
 
 

@@ -40,6 +40,10 @@ class Interpreter(object):
     def visit(self, node):
         pass
 
+    @when(AST.Program)
+    def visit(self, node):
+        node.lines.accept(self)
+
     @when(AST.Lines)
     def visit(self, node):
         if node.lines is not None:
@@ -48,7 +52,7 @@ class Interpreter(object):
 
     @when(AST.Print)
     def visit(self, node):
-        print(" ".join([str(element.accept(self)) for element in node.expr]))
+        print(" ".join([str(element.accept(self)) for element in [node.expr]]))
 
     @when(AST.Return)
     def visit(self, node):
@@ -102,6 +106,7 @@ class Interpreter(object):
 
     @when(AST.ForLoop)
     def visit(self, node):
+        print(node.variable)
         variable = node.variable.accept(self)
         start = node.start.accept(self)
         end = node.end.accept(self)
@@ -129,7 +134,7 @@ class Interpreter(object):
 
     @when(AST.Vector)
     def visit(self, node):
-        return [n.accept(self) for n in node.vector]
+        return [n.accept(self) for n in node.vector_elements]
 
     # TODO
     @when(AST.VectorList)
@@ -166,52 +171,33 @@ class Interpreter(object):
 
     @when(AST.LValue)
     def visit(self, node):
-        pass
+        return self.mem_stack.get(node.identifier)
 
-    @when(AST.Print)
+    @when(AST.RefValue)
+    def visit(self, node):
+        row = node.row.accept(self)
+        column = node.column.accept(self)
+        return self.mem_stack.get(node.identifier)[row][column]
+
+    # TODO
+    @when(AST.ElementsList)
     def visit(self, node):
         pass
 
-    @when(AST.Print)
+    @when(AST.Transpose)
+    def visit(self, node):
+        array = self.mem_stack.get(node.identifier)
+        return array.T
+        
+    @when(AST.UnaryOp)
+    def visit(self, node):
+        operand = node.operand.accept(self)
+        if node.operatoe == "-":
+            operand = -1 * operand
+        return operand
+
+    # TODO
+    @when(AST.Block)
     def visit(self, node):
         pass
-
-    @when(AST.Print)
-    def visit(self, node):
-        pass
-
-    @when(AST.Print)
-    def visit(self, node):
-        pass
-
-    @when(AST.Print)
-    def visit(self, node):
-        pass
-
-
-
-    @when(AST.BinOp)
-    def visit(self, node):
-        r1 = node.left.accept(self)
-        r2 = node.right.accept(self)
-        # try sth smarter than:
-        # if(node.op=='+') return r1+r2
-        # elsif(node.op=='-') ...
-        # but do not use python eval
-        pass
-
-    @when(AST.Assignment)
-    def visit(self, node):
-    #
-    #
-        pass
-
-    # simplistic while loop interpretation
-    @when(AST.WhileInstr)
-    def visit(self, node):
-        r = None
-        while node.cond.accept(self):
-            r = node.body.accept(self)
-        return r
-
 
