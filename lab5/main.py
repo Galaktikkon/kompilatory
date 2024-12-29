@@ -17,7 +17,7 @@ if __name__ == "__main__":
     parser = Mparser()
     lexer = Scanner()
     text = file.read()
-    
+
     ast = parser.parse(lexer.tokenize(text))
 
     # Below code shows how to use visitor

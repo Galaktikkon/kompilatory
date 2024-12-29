@@ -27,6 +27,7 @@ class Mparser(Parser):
 
     @_("lines")
     def program(self, p):
+
         return AST.Program(p[0], p.lineno)
 
     @_("line lines", "line")

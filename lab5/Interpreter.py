@@ -1,8 +1,7 @@
-
 import AST
 import SymbolTable
 from Memory import *
-from Exceptions import  *
+from Exceptions import *
 from visit import *
 import sys
 import numpy as np
@@ -10,33 +9,32 @@ import numpy as np
 sys.setrecursionlimit(10000)
 
 operations = {
-    '+': (lambda x, y: x + y),
-    '+=': (lambda x, y: x + y),
-    '-': (lambda x, y: x - y),
-    '-=': (lambda x, y: x - y),
-    '*': (lambda x, y: x * y),
-    '*=': (lambda x, y: x * y),
-    '/': (lambda x, y: x / y),
-    '/=': (lambda x, y: x / y),
-
-    '==': (lambda x, y: x == y),
-    '!=': (lambda x, y: x != y),
-    '>=': (lambda x, y: x >= y),
-    '>': (lambda x, y: x > y),
-    '<=': (lambda x, y: x <= y),
-    '<': (lambda x, y: x < y),
-
-    '.+': (lambda x, y: (np.matrix(x) + np.matrix(y)).tolist()),
-    '.-': (lambda x, y: (np.matrix(x) - np.matrix(y)).tolist()),
-    '.*': (lambda x, y: np.multiply(np.array(x), np.array(y)).tolist()),
-    './': (lambda x, y: np.divide(np.array(x), np.array(y)).tolist())
+    "+": (lambda x, y: x + y),
+    "+=": (lambda x, y: x + y),
+    "-": (lambda x, y: x - y),
+    "-=": (lambda x, y: x - y),
+    "*": (lambda x, y: x * y),
+    "*=": (lambda x, y: x * y),
+    "/": (lambda x, y: x / y),
+    "/=": (lambda x, y: x / y),
+    "==": (lambda x, y: x == y),
+    "!=": (lambda x, y: x != y),
+    ">=": (lambda x, y: x >= y),
+    ">": (lambda x, y: x > y),
+    "<=": (lambda x, y: x <= y),
+    "<": (lambda x, y: x < y),
+    ".+": (lambda x, y: (np.matrix(x) + np.matrix(y)).tolist()),
+    ".-": (lambda x, y: (np.matrix(x) - np.matrix(y)).tolist()),
+    ".*": (lambda x, y: np.multiply(np.array(x), np.array(y)).tolist()),
+    "./": (lambda x, y: np.divide(np.array(x), np.array(y)).tolist()),
 }
+
 
 class Interpreter(object):
     def __init__(self):
         self.mem_stack = MemoryStack()
 
-    @on('node')
+    @on("node")
     def visit(self, node):
         pass
 
@@ -142,7 +140,6 @@ class Interpreter(object):
     def visit(self, node):
         pass
 
-
     @when(AST.Matrix)
     def visit(self, node):
         return [n.accept(self) for n in node.vectors]
@@ -151,11 +148,11 @@ class Interpreter(object):
     def visit(self, node):
         type = node.type
         enumerable = node.enumerable.accept(self)
-        if type == 'zeros':
+        if type == "zeros":
             return np.zeros(enumerable).tolist()
-        elif type == 'ones':
+        elif type == "ones":
             return np.ones(enumerable).tolist()
-        elif type == 'eye':
+        elif type == "eye":
             return np.eye(enumerable).tolist()
 
     @when(AST.String)
@@ -165,7 +162,7 @@ class Interpreter(object):
     @when(AST.FloatNum)
     def visit(self, node):
         return node.value
-    
+
     @when(AST.IntNum)
     def visit(self, node):
         return node.value
