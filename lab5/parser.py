@@ -83,7 +83,7 @@ class Mparser(Parser):
     def condition(self, p):
         return AST.BinOp(p[1], p[0], p[2], p.lineno)
 
-    @_('FOR ID "=" enumerable ":" enumerable line')
+    @_('FOR ID "=" expr ":" expr line')
     def line(self, p):
         return AST.ForLoop(p[1], p[3], p[5], p[6], p.lineno)
 
