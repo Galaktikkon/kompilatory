@@ -16,22 +16,23 @@ class NodeVisitor(object):
         return visitor(node)
 
     def generic_visit(self, node):
-        print("Gen visit: " + node + ": " + str(node))
+        print(f"Gen visit: {node}: {str(node)}")
 
 
 class TypeChecker(NodeVisitor):
     def __init__(self):
         self.symbol_table = SymbolTable(None, "Program")
         self.error_list = []
+        self.loop_iterator = 0
 
     def visit_Program(self, node):
         self.visit(node.lines)
 
     def visit_Lines(self, node):
         current = node
-        while current is not None:
-            self.visit(current.line)
-            current = current.lines
+        if current is not None:
+            for line in current.lines:
+                self.visit(line)
 
     def visit_Print(self, node):
         self.visit(node.expr)
@@ -95,6 +96,7 @@ class TypeChecker(NodeVisitor):
             return result_type(node.op, type_left, type_right)
 
     def visit_ForLoop(self, node):
+        '''
         self.symbol_table = self.symbol_table.pushScope(FOR_SCOPE)
         start_type = self.visit(node.start)
         end_type = self.visit(node.end)
@@ -102,6 +104,14 @@ class TypeChecker(NodeVisitor):
             self.symbol_table.put(node.variable, Int)
         self.visit(node.body)
         self.symbol_table = self.symbol_table.popScope()
+        '''
+        self.visit(node.id)
+        self.visit(node.start)
+        self.visit(node.end)
+        self.loop_iterator += 1
+        self.visit(node.body)
+        self.loop_iterator -= 1
+
 
     def visit_WhileLoop(self, node):
         cond_type = self.visit(node.condition)

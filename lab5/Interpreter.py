@@ -46,9 +46,8 @@ class Interpreter(object):
 
     @when(AST.Lines)
     def visit(self, node):
-        if node.lines is not None:
-            node.lines.accept(self)
-        node.line.accept(self)
+        for line in node.lines:
+            line.accept(self)
 
     @when(AST.Print)
     def visit(self, node):
@@ -68,21 +67,23 @@ class Interpreter(object):
 
     @when(AST.Assignment)
     def visit(self, node):
-        variable = node.variable.accept(self)
         expr = node.expr.accept(self)
         op = node.op
         if op == '=':
-            if isinstance(variable, AST.RefValue):
-                tmp = np.array(self.mem_stack.get(variable.name))
-                indexes = tuple([i.accept(self) for i in variable.indexes.indexes])
-                tmp[indexes] = expr
-                self.mem_stack.set(variable.name, tmp.tolist())
+            if isinstance(node.variable, AST.RefValue):
+                tmp = np.array(self.mem_stack.get(node.variable.identifier))
+                row, col = node.row.accept(self), node.col.accept(self)
+                if col != None:
+                    tmp[row][col] = expr
+                else:
+                    tmp[row] = expr
+                self.mem_stack.set(node.variable.identifier, tmp.tolist())
             else:
-                self.mem_stack.set(variable.name, expr)
+                self.mem_stack.set(node.variable.identifier, expr)
         else:
-            left = self.mem_stack.get(variable.name)
+            left = self.mem_stack.get(node.variable.identifier)
             result = operations[op](left, expr)
-            self.mem_stack.set(variable.name, result)
+            self.mem_stack.set(node.variable.identifier, result)
 
     @when(AST.IfElse)
     def visit(self, node):
@@ -106,26 +107,26 @@ class Interpreter(object):
 
     @when(AST.ForLoop)
     def visit(self, node):
-        print(node.variable)
-        variable = node.variable.accept(self)
         start = node.start.accept(self)
         end = node.end.accept(self)
-
-        self.mem_stack.set(variable.name, start)
-        while variable < end:
+        iterator = node.id
+        self.mem_stack.set(node.id, start)
+        while iterator < end:
             try:
+                self.mem_stack.push(Memory("for"))
                 node.body.accept(self)
             except BreakException:
                 break
             except ContinueException:
                 continue
-        variable = node.variable.accept(self) + 1
-        self.mem_stack.set(variable.name, variable)
+            iterator = self.mem_stack.get(node.id) + 1
+            self.mem_stack.set(node.id, iterator)
 
     @when(AST.WhileLoop)
     def visit(self, node):
         while node.condition.accept(self):
             try:
+                self.mem_stack.push(Memory("while"))
                 node.body.accept(self)
             except BreakException:
                 break
@@ -192,7 +193,7 @@ class Interpreter(object):
     @when(AST.UnaryOp)
     def visit(self, node):
         operand = node.operand.accept(self)
-        if node.operatoe == "-":
+        if node.operator == "-":
             operand = -1 * operand
         return operand
 

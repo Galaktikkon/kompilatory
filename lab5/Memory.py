@@ -16,14 +16,14 @@ class Memory:
 
 class MemoryStack:                                                      
     def __init__(self, memory=None): # initialize memory stack with memory <memory>
+        memory = Memory('global') if memory is None else memory
         self.stack = [memory]
 
     def get(self, name):             # gets from memory stack current value of variable <name>
         for element in reversed(self.stack):
-            if element is not None:
-                value = element.get(name)
-                if value is not None:
-                    return value
+            value = element.get(name)
+            if value is not None:
+                return value
         return None
 
     def insert(self, name, value): # inserts into memory stack variable <name> with value <value>

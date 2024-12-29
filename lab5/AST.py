@@ -13,8 +13,8 @@ class Program(Node):
 
 class Lines(Node):
     def __init__(self, line, lines=None, line_number=None):
-        self.lines = lines
-        self.line = line
+        self.lines = lines.lines if lines else []
+        self.lines.append(line)
         self.line_number = line_number
 
 
@@ -68,7 +68,7 @@ class BinOp(Node):
 
 class ForLoop(Node):
     def __init__(self, variable, start, end, body, line_number=None):
-        self.variable = variable
+        self.id = variable
         self.start = start
         self.end = end
         self.body = body

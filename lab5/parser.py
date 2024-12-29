@@ -106,7 +106,6 @@ class Mparser(Parser):
 
     @_("vectors", "matrix", "element")
     def expr(self, p):
-
         return p[0]
 
     @_("vector", 'vector "," vectors')
