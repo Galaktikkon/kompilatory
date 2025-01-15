@@ -13,8 +13,8 @@ class Program(Node):
 
 class Lines(Node):
     def __init__(self, line, lines=None, line_number=None):
-        self.lines = lines.lines if lines else []
-        self.lines.append(line)
+        self.lines = lines
+        self.line = line
         self.line_number = line_number
 
 

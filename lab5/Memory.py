@@ -4,7 +4,7 @@ class Memory:
         self.heap = {}
 
     def has_key(self, name):  # variable name
-        return name in self.heap
+        return name in self.heap.keys()
 
     def get(self, name):  # gets from memory current value of variable <name>
         return self.heap.get(name, None)
@@ -12,18 +12,9 @@ class Memory:
     def put(self, name, value):  # puts into memory current value of variable <name>
         self.heap.update({name: value})
 
-<<<<<<< HEAD
 class MemoryStack:                                                      
     def __init__(self, memory=None): # initialize memory stack with memory <memory>
         memory = Memory('global') if memory is None else memory
-||||||| merged common ancestors
-class MemoryStack:                                                      
-    def __init__(self, memory=None): # initialize memory stack with memory <memory>
-=======
-
-class MemoryStack:
-    def __init__(self, memory=None):  # initialize memory stack with memory <memory>
->>>>>>> 9c937cbe3d88fcb48728cd81ff1661b757e9ac07
         self.stack = [memory]
 
     def get(self, name):  # gets from memory stack current value of variable <name>
@@ -33,9 +24,7 @@ class MemoryStack:
                 return value
         return None
 
-    def insert(
-        self, name, value
-    ):  # inserts into memory stack variable <name> with value <value>
+    def insert(self, name, value):  # inserts into memory stack variable <name> with value <value>
         self.stack[-1].put(name, value)
 
     def set(self, name, value):  # sets variable <name> to value <value>

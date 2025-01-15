@@ -16,7 +16,7 @@ class NodeVisitor(object):
         return visitor(node)
 
     def generic_visit(self, node):
-        print("Gen visit: " + node + ": " + str(node))
+        print(f"Gen visit: {node}: {str(node)}")
 
 
 class TypeChecker(NodeVisitor):
@@ -30,9 +30,9 @@ class TypeChecker(NodeVisitor):
 
     def visit_Lines(self, node):
         current = node
-        if current is not None:
-            for line in current.lines:
-                self.visit(line)
+        while current is not None:
+            self.visit(current.line)
+            current = current.lines
 
     def visit_Print(self, node):
         self.visit(node.expr)
@@ -41,7 +41,6 @@ class TypeChecker(NodeVisitor):
         self.visit(node.expr)
 
     def visit_Break(self, node):
-
         scope = self.symbol_table.name
         if not (scope == FOR_SCOPE or scope == WHILE_SCOPE):
             self.error_list.append(
@@ -100,7 +99,7 @@ class TypeChecker(NodeVisitor):
         start_type = self.visit(node.start)
         end_type = self.visit(node.end)
         if start_type is Int and end_type is Int:
-            self.symbol_table.put(node.variable, Int)
+            self.symbol_table.put(node.id, Int)
         self.visit(node.body)
         self.symbol_table = self.symbol_table.popScope()
 

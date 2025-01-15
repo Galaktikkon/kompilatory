@@ -44,12 +44,15 @@ class Interpreter(object):
 
     @when(AST.Lines)
     def visit(self, node):
-        for line in node.lines:
-            line.accept(self)
+        node.line.accept(self)
+        if node.lines != None:
+            node.lines.accept(self)
 
     @when(AST.Print)
     def visit(self, node):
-        print(" ".join([str(element.accept(self)) for element in [node.expr]]))
+        expr = node.expr.accept(self)
+        print(expr)
+        #print(" ".join([str(element.accept(self)) for element in [node.expr]]))
 
     @when(AST.Return)
     def visit(self, node):
@@ -70,7 +73,7 @@ class Interpreter(object):
         if op == '=':
             if isinstance(node.variable, AST.RefValue):
                 tmp = np.array(self.mem_stack.get(node.variable.identifier))
-                row, col = node.row.accept(self), node.col.accept(self)
+                row, col = node.variable.row.accept(self), node.variable.col.accept(self)
                 if col != None:
                     tmp[row][col] = expr
                 else:
@@ -107,38 +110,41 @@ class Interpreter(object):
     def visit(self, node):
         start = node.start.accept(self)
         end = node.end.accept(self)
-        iterator = node.id
+        self.mem_stack.push(Memory("for"))
         self.mem_stack.set(node.id, start)
+        iterator = self.mem_stack.get(node.id)
         while iterator < end:
             try:
-                self.mem_stack.push(Memory("for"))
                 node.body.accept(self)
             except BreakException:
                 break
             except ContinueException:
                 continue
-            iterator = self.mem_stack.get(node.id) + 1
-            self.mem_stack.set(node.id, iterator)
+            self.mem_stack.set(node.id, iterator+1)
+            iterator = self.mem_stack.get(node.id)
+        self.mem_stack.pop()
 
     @when(AST.WhileLoop)
     def visit(self, node):
+        self.mem_stack.push(Memory("while"))
         while node.condition.accept(self):
             try:
-                self.mem_stack.push(Memory("while"))
                 node.body.accept(self)
             except BreakException:
                 break
             except ContinueException:
                 continue
+        self.mem_stack.pop()
 
     @when(AST.Vector)
     def visit(self, node):
         return [n.accept(self) for n in node.vector_elements]
 
-    # TODO
     @when(AST.VectorList)
     def visit(self, node):
-        pass
+        node.vector.accept(self)
+        if node.vectors != None:
+            node.vectors.accept(self)
 
     @when(AST.Matrix)
     def visit(self, node):
@@ -147,25 +153,29 @@ class Interpreter(object):
     @when(AST.MatrixOp)
     def visit(self, node):
         type = node.type
-        enumerable = node.enumerable.accept(self)
+        x = node.enumerable1.accept(self)
+        if node.enumerable2 == None:
+            y = None
+        else:
+            y = node.enumerable2.accept(self)
         if type == "zeros":
-            return np.zeros(enumerable).tolist()
+            return np.zeros((x, y)).tolist()
         elif type == "ones":
-            return np.ones(enumerable).tolist()
+            return np.ones(x, y).tolist()
         elif type == "eye":
-            return np.eye(enumerable).tolist()
+            return np.eye(x, y).tolist()
 
     @when(AST.String)
     def visit(self, node):
-        return node.value[1:-1]
+        return str(node.value[1:-1])
 
     @when(AST.FloatNum)
     def visit(self, node):
-        return node.value
+        return float(node.value)
 
     @when(AST.IntNum)
     def visit(self, node):
-        return node.value
+        return int(node.value)
 
     @when(AST.LValue)
     def visit(self, node):
@@ -174,13 +184,14 @@ class Interpreter(object):
     @when(AST.RefValue)
     def visit(self, node):
         row = node.row.accept(self)
-        column = node.column.accept(self)
+        column = node.col.accept(self)
         return self.mem_stack.get(node.identifier)[row][column]
 
-    # TODO
     @when(AST.ElementsList)
     def visit(self, node):
-        pass
+        node.element.accept(self)
+        if node.element_list != None:
+            node.element_list.accept(self)
 
     @when(AST.Transpose)
     def visit(self, node):
@@ -194,8 +205,7 @@ class Interpreter(object):
             operand = -1 * operand
         return operand
 
-    # TODO
     @when(AST.Block)
     def visit(self, node):
-        pass
+        node.lines.accept(self)
 
