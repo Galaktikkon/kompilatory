@@ -19,8 +19,9 @@ class Lines(Node):
 
 
 class Print(Node):
-    def __init__(self, expr, line_number=None):
-        self.expr = expr
+    def __init__(self, expr1, expr2=None, line_number=None):
+        self.expr1 = expr1
+        self.expr2 = expr2
         self.line_number = line_number
 
 

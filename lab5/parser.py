@@ -36,10 +36,24 @@ class Mparser(Parser):
         else:
             return AST.Lines(p[0], p[1], p.lineno)
 
+    '''   
+    @_('expr "," expr_list', "expr")
+    def expr_list(self, p):
+        pass
+    '''
+    '''
     @_('PRINT expr ";"')
     def line(self, p):
         return AST.Print(p[1], p.lineno)
-
+    '''
+    @_('PRINT expr ";"')
+    def line(self, p):
+        return AST.Print(p[1], None, p.lineno)
+    
+    @_('PRINT element "," element ";"')
+    def line(self, p):
+        return AST.Print(p[1], p[3], p.lineno)
+    
     @_('RETURN expr ";"')
     def line(self, p):
         return AST.Return(p[1], p.lineno)

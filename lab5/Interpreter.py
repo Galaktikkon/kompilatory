@@ -50,9 +50,12 @@ class Interpreter(object):
 
     @when(AST.Print)
     def visit(self, node):
-        expr = node.expr.accept(self)
-        print(expr)
-        #print(" ".join([str(element.accept(self)) for element in [node.expr]]))
+        expr1 = node.expr1.accept(self)
+        if node.expr2 != None:
+            expr2 = node.expr2.accept(self)
+            print(f"{expr1}, {expr2}")
+        else:
+            print(expr1)
 
     @when(AST.Return)
     def visit(self, node):
@@ -138,7 +141,7 @@ class Interpreter(object):
 
     @when(AST.Vector)
     def visit(self, node):
-        return [n.accept(self) for n in node.vector_elements]
+        node.vector_elements.accept(self)
 
     @when(AST.VectorList)
     def visit(self, node):
@@ -155,14 +158,16 @@ class Interpreter(object):
         type = node.type
         x = node.enumerable1.accept(self)
         if node.enumerable2 == None:
-            y = None
+            y = 1
         else:
             y = node.enumerable2.accept(self)
         if type == "zeros":
             return np.zeros((x, y)).tolist()
         elif type == "ones":
-            return np.ones(x, y).tolist()
+            return np.ones((x, y)).tolist()
         elif type == "eye":
+            if node.enumerable2 == None:
+                y = None
             return np.eye(x, y).tolist()
 
     @when(AST.String)

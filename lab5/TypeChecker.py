@@ -35,7 +35,9 @@ class TypeChecker(NodeVisitor):
             current = current.lines
 
     def visit_Print(self, node):
-        self.visit(node.expr)
+        self.visit(node.expr1)
+        if node.expr2 != None:
+            self.visit(node.expr2)
 
     def visit_Return(self, node):
         self.visit(node.expr)
