@@ -73,10 +73,12 @@ class Interpreter(object):
     def visit(self, node):
         expr = node.expr.accept(self)
         op = node.op
-        if op == '=':
+        if op == "=":
             if isinstance(node.variable, AST.RefValue):
                 tmp = np.array(self.mem_stack.get(node.variable.identifier))
-                row, col = node.variable.row.accept(self), node.variable.col.accept(self)
+                row, col = node.variable.row.accept(self), node.variable.col.accept(
+                    self
+                )
                 if col != None:
                     tmp[row][col] = expr
                 else:
@@ -127,7 +129,7 @@ class Interpreter(object):
                 break
             except ContinueException:
                 continue
-            self.mem_stack.set(node.id, iterator+1)
+            self.mem_stack.set(node.id, iterator + 1)
             iterator = self.mem_stack.get(node.id)
         self.mem_stack.pop()
 
@@ -155,7 +157,7 @@ class Interpreter(object):
 
     @when(AST.Matrix)
     def visit(self, node):
-        return [n.accept(self) for n in node.vectors]
+        node.vectors.accept(self)
 
     @when(AST.MatrixOp)
     def visit(self, node):
@@ -206,7 +208,7 @@ class Interpreter(object):
     def visit(self, node):
         array = self.mem_stack.get(node.identifier)
         return array.T
-        
+
     @when(AST.UnaryOp)
     def visit(self, node):
         operand = node.operand.accept(self)
@@ -217,4 +219,3 @@ class Interpreter(object):
     @when(AST.Block)
     def visit(self, node):
         node.lines.accept(self)
-
