@@ -38,8 +38,12 @@ class Mparser(Parser):
 
     @_('PRINT expr ";"')
     def line(self, p):
-        return AST.Print(p[1], p.lineno)
-
+        return AST.Print(p[1], None, p.lineno)
+    
+    @_('PRINT element "," element ";"')
+    def line(self, p):
+        return AST.Print(p[1], p[3], p.lineno)
+    
     @_('RETURN expr ";"')
     def line(self, p):
         return AST.Return(p[1], p.lineno)
@@ -83,7 +87,7 @@ class Mparser(Parser):
     def condition(self, p):
         return AST.BinOp(p[1], p[0], p[2], p.lineno)
 
-    @_('FOR ID "=" enumerable ":" enumerable line')
+    @_('FOR ID "=" expr ":" expr line')
     def line(self, p):
         return AST.ForLoop(p[1], p[3], p[5], p[6], p.lineno)
 
@@ -106,7 +110,6 @@ class Mparser(Parser):
 
     @_("vectors", "matrix", "element")
     def expr(self, p):
-
         return p[0]
 
     @_("vector", 'vector "," vectors')
