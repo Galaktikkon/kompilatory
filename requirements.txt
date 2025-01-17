@@ -7,6 +7,7 @@ filelock==3.16.1
 identify==2.6.2
 mypy-extensions==1.0.0
 nodeenv==1.9.1
+numpy==2.2.1
 packaging==24.1
 pathspec==0.12.1
 platformdirs==4.3.6
@@ -14,4 +15,3 @@ pre_commit==4.0.1
 PyYAML==6.0.2
 sly==0.5
 virtualenv==20.27.1
-numpy==24.3.1
