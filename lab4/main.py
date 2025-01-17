@@ -7,8 +7,8 @@ from TreePrinter import TreePrinter
 if __name__ == "__main__":
 
     try:
-        filename = sys.argv[1] if len(sys.argv) > 1 else "examples//control_transfer.txt"
-        #filename = sys.argv[1] if len(sys.argv) > 1 else "examples//init.txt"
+        #filename = sys.argv[1] if len(sys.argv) > 1 else "examples//control_transfer.txt"
+        filename = sys.argv[1] if len(sys.argv) > 1 else "examples//init.txt"
         #filename = sys.argv[1] if len(sys.argv) > 1 else "examples//loops.txt"
         #filename = sys.argv[1] if len(sys.argv) > 1 else "examples//opers.txt"
         file = open(filename, "r")

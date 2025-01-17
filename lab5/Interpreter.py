@@ -23,10 +23,10 @@ operations = {
     ">": (lambda x, y: x > y),
     "<=": (lambda x, y: x <= y),
     "<": (lambda x, y: x < y),
-    ".+": (lambda x, y: (np.matrix(x) + np.matrix(y)).tolist()),
-    ".-": (lambda x, y: (np.matrix(x) - np.matrix(y)).tolist()),
-    ".*": (lambda x, y: np.multiply(np.array(x), np.array(y)).tolist()),
-    "./": (lambda x, y: np.divide(np.array(x), np.array(y)).tolist()),
+    ".+": (lambda x, y: (np.matrix(x) + np.matrix(y))),
+    ".-": (lambda x, y: (np.matrix(x) - np.matrix(y))),
+    ".*": (lambda x, y: np.multiply(np.array(x), np.array(y))),
+    "./": (lambda x, y: np.divide(np.array(x), np.array(y))),
 }
 
 
@@ -81,7 +81,7 @@ class Interpreter(object):
                     tmp[row][col] = expr
                 else:
                     tmp[row] = expr
-                self.mem_stack.set(node.variable.identifier, tmp.tolist())
+                self.mem_stack.set(node.variable.identifier, tmp)
             else:
                 self.mem_stack.set(node.variable.identifier, expr)
         else:
@@ -93,13 +93,17 @@ class Interpreter(object):
     def visit(self, node):
         if node.condition.accept(self):
             self.mem_stack.push(Memory("if"))
-            result = node.if_branch.accept(self)
-            self.mem_stack.pop()
+            try:
+                result = node.if_branch.accept(self)
+            finally:
+                self.mem_stack.pop()
             return result
         elif not node.condition.accept(self) and node.else_branch is not None:
             self.mem_stack.push(Memory("else"))
-            result = node.else_branch.accept(self)
-            self.mem_stack.pop()
+            try:
+                result = node.else_branch.accept(self)
+            finally:
+                self.mem_stack.pop()
             return result
 
     @when(AST.BinOp)

@@ -7,10 +7,10 @@ from Interpreter import Interpreter
 if __name__ == "__main__":
 
     try:
-        filename = sys.argv[1] if len(sys.argv) > 1 else "examples//fibonacci.txt"
+        #filename = sys.argv[1] if len(sys.argv) > 1 else "examples//fibonacci.txt"
         #filename = sys.argv[1] if len(sys.argv) > 1 else "examples//matrix.txt"
         #filename = sys.argv[1] if len(sys.argv) > 1 else "examples//pi.txt"
-        #filename = sys.argv[1] if len(sys.argv) > 1 else "examples//primes.txt"
+        filename = sys.argv[1] if len(sys.argv) > 1 else "examples//primes.txt"
         #filename = sys.argv[1] if len(sys.argv) > 1 else "examples//sqrt.txt"
         #filename = sys.argv[1] if len(sys.argv) > 1 else "examples//triangle.txt"
 
